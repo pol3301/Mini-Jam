@@ -49,6 +49,17 @@ class BasicSprite:
     def draw(self, surface):
         surface.blit(self.image, self.rect)
 
+class BasicText:
+    def __init__(self, font: pygame.freetype.Font, pos, text, color="black"):
+        self.font = font
+        self.pos = pos
+        self.text = text
+        self.color = color
+    def tick(self):
+        pass
+    def draw(self, surface):
+        self.font.render_to(surface, self.pos, self.text, fgcolor=self.color)
+
 #general dino structure
 class DinoCharacter:
     def __init__(self, name, image, size, traits, recruit_cost, duration):
