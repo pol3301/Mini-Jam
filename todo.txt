@@ -4,14 +4,14 @@ Announcement Phase:
 DAY X
 That's it
 
-Party Phase:
+Party Phase: -- PAUL
 
 Depending on reputation get party contracts of 3 different tiers:
 Poor, Middle, Rich
 Choose to accept or reject each contract.
 No maximum, but dependent on how many dinosaurs
 
-Shop Phase:
+Shop Phase: -- MAX
 
 Money left
 Selection of different dinosaurs
