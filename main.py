@@ -20,15 +20,40 @@ class DisplayScreen:
 dscreen = DisplayScreen(1280, 720)
 game_state = "title_screen"
 
+#game state change
+EVENT_GAME_STATE_CHANGED = pygame.event.custom_type()
+
+#shop code
+class ShopDino:
+
+    def __init__(self, image, pos):
+        self.image = pygame.image.load(image).convert_alpha()
+        self.rect = self.image.get_rect(center=pos)
+
+    def tick(self):
+        pass
+
+    def draw(self, surface):
+        self.image.blit(surface, self.rect)
+
+objects = []
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.WINDOWSIZECHANGED:
             dscreen.update_size([event.x, event.y])
+        if event.type == EVENT_GAME_STATE_CHANGED:
+            game_state = event.new_state
+            if event.new_state == "phase_shop":
+                objects = []
+                for i in range(5):
+                    pass
+                    #objects.append(ShopDino())
     
     if game_state == "title_screen":
-        pass
+        pygame.event.post(EVENT_GAME_STATE_CHANGED, new_state="phase_shop")
     elif game_state == "phase_shop":
         pass
     elif game_state == "phase_contracts":
