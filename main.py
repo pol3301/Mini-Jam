@@ -178,6 +178,29 @@ money_count_text = BasicText(sysfont_20, (10, 10), "0")
 shop_dinos = []
 dino_info_box = DinoInfoBox(None, (500, 500), (750, 500), sysfont_20, (0,0,0,125), "white")
 
+def generate_dinos(amount, day, reputation):
+    cutouts = 0
+    costumes = 0
+    reals = 0
+    quality = 0
+    returning_dinos = []
+    strong_traits = party.dinosaur_characteristics
+    weak_traits = party.dinosaur_characteristics
+    for i in range(amount):
+        for i in range(day*2 * math.ceil(reputation/50)):
+            quality += random.randint(3, 6)
+        if quality <= 18:
+            cutouts += 1
+        elif quality <= 81:
+            costumes += 1
+        elif quality > 81:
+            reals += 1
+    #for i in range(cutouts):
+        #if random.randint(1, 5) == 5:
+        #    returning_dinos.append(DinoCharacter())
+                
+
+
 objects = []
 
 mouse_just_pressed = False
@@ -201,6 +224,7 @@ while running:
             game_state = event.new_state
             if event.new_state == "phase_shop":
                 for i in range(5):
+
                     shop_dinos.append(ShopDino(example_dino, (random.randint(100, 1180), random.randint(50, 670))))
                 for i in shop_dinos:
                     objects.append(i)
@@ -214,7 +238,7 @@ while running:
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
 
     elif game_state == "phase_shop":
-        money_count_text.text = str(money)
+        money_count_text.text = f"Money: {str(money)}"
         for i in shop_dinos:
             if i.rect.collidepoint(mouse_pos) and mouse_just_pressed:
                 i.grab()
