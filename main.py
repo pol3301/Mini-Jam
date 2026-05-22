@@ -9,7 +9,6 @@ import constants
 
 pygame.init()
 pygame.freetype.init()
-screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 screen = pygame.display.set_mode(constants.SCREEN_SIZE, pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
