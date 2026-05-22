@@ -32,8 +32,18 @@ reputation = 100
 current_day = 1
 
 
+
 #game state change
 EVENT_GAME_STATE_CHANGE = pygame.event.custom_type()
+
+class BasicSprite:
+    def __init__(self, image, size, pos):
+        self.image = pygame.transform.scale(pygame.image.load(image).convert_alpha(), size)
+        self.rect = self.image.get_rect(center=pos)
+    def tick(self):
+        pass
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
 
 #general dino structure
 class DinoCharacter:
@@ -112,6 +122,11 @@ def adjust_pos_to_display(pos):
     adjusted_y = adjusted_y * ratio_y
     return int(adjusted_x), int(adjusted_y)
 
+#shop things
+next_button = BasicSprite("assets/end_shop_button.png", (250, 150), (500, 500))
+buy_basket = BasicSprite("assets/basket.png", (200, 200), (1000, 500))
+shop_dinos = []
+
 objects = []
 
 mouse_just_pressed = False
@@ -135,20 +150,32 @@ while running:
             game_state = event.new_state
             if event.new_state == "phase_shop":
                 for i in range(5):
-                    objects.append(ShopDino(example_dino, (random.randint(100, 1180), random.randint(50, 670))))
+                    shop_dinos.append(ShopDino(example_dino, (random.randint(100, 1180), random.randint(50, 670))))
+                for i in shop_dinos:
+                    objects.append(i)
+                objects.append(next_button)
+                objects.append(buy_basket)
     
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
 
     elif game_state == "phase_shop":
-        for i in objects:
+        for i in shop_dinos:
             if i.rect.collidepoint(mouse_pos) and mouse_just_pressed:
                 i.grab()
                 break
-            elif not mouse_down and i.state == "grabbed":
-                print("test")
-                i.state = "roaming"
+
+            if not mouse_down and i.state == "grabbed":
+                if buy_basket.rect.collidepoint(mouse_pos):
+                    dinos.append(i.dino_character)
+                    shop_dinos.remove(i)
+                    objects.remove(i)
+                else:
+                    i.state = "roaming"
+
             i.tick(mouse_pos)
+        if mouse_just_pressed and next_button.rect.collidepoint(mouse_pos):
+            pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_admin"))
 
     elif game_state == "phase_contracts":
         pass
