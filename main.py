@@ -26,6 +26,7 @@ while running:
         if event.type == pygame.WINDOWSIZECHANGED:
             dscreen.update_size([event.x, event.y])
 
+    screen.fill("black")
     dscreen.surface.fill("purple")
 
     dscreen.render(screen)
