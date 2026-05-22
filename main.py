@@ -3,6 +3,7 @@ import random
 import math
 
 pygame.init()
+pygame.font.init()
 screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
@@ -25,11 +26,24 @@ game_state = "title_screen"
 #game state change
 EVENT_GAME_STATE_CHANGE = pygame.event.custom_type()
 
+#general dino structure
+class DinoCharacter:
+    def __init__(self, name, image, size, traits, recruit_cost, duration):
+        self.name = name
+        self.image = pygame.transform.scale(pygame.image.load(image).convert_alpha(), (size, size))
+        self.traits = traits
+        self.recruit_cost = recruit_cost
+        self.inital_duration = duration
+        self.days_remaining = duration
+
+example_dino = DinoCharacter("Placeholder", "assets/dino_placeholder1.png", 200, ["Dumb"], 50, 3)
+
 #shop code
 class ShopDino:
 
-    def __init__(self, image, size, pos):
-        self.image = pygame.transform.scale(pygame.image.load(image).convert_alpha(), size)
+    def __init__(self, dino_character: DinoCharacter, pos):
+        self.image = pygame.transform.scale(dino_character.image, (100, 100))
+        self.dino_character = dino_character
         self.rect = self.image.get_rect(center=pos)
         self.state = "roaming"
         self.next_roam = 0
