@@ -1,9 +1,10 @@
 import pygame
+import pygame.freetype
 import random
 import math
 
 pygame.init()
-pygame.font.init()
+pygame.freetype.init()
 screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
@@ -22,6 +23,7 @@ class DisplayScreen:
 
 dscreen = DisplayScreen(1280, 720)
 game_state = "title_screen"
+sysfont = pygame.freetype.SysFont("arial", 10)
 
 #game state change
 EVENT_GAME_STATE_CHANGE = pygame.event.custom_type()
@@ -84,6 +86,7 @@ class ShopDino:
             self.rect.bottom = 720
 
     def draw(self, surface):
+        sysfont.render_to(surface, (self.rect.centerx, self.rect.bottom + 20), f"{self.dino_character.recruit_cost}")
         if self.state == "idle":
             surface.blit(self.image, self.rect)
         elif self.state == "roaming":
@@ -125,7 +128,7 @@ while running:
             game_state = event.new_state
             if event.new_state == "phase_shop":
                 for i in range(5):
-                    objects.append(ShopDino("assets/dino_placeholder1.png", (100, 100), (500, 500)))
+                    objects.append(ShopDino(example_dino, (random.randint(100, 1180), random.randint(50, 670))))
     
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
