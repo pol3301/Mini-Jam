@@ -1,0 +1,34 @@
+GAME -
+
+Announcement Phase:
+DAY X
+That's it
+
+Party Phase:
+
+Depending on reputation get party contracts of 3 different tiers:
+Poor, Middle, Rich
+Choose to accept or reject each contract.
+No maximum, but dependent on how many dinosaurs
+
+Shop Phase:
+
+Money left
+Selection of different dinosaurs
+Each one has a price and a timeframe
+Three tiers of dino: Cardboard cutout, costume, and real
+
+Administration Phase:
+
+Send dinos to respective parties
+Can see party info, preferences, etc
+Only one party per dino
+Three dinos max per party
+
+Results Phase:
+
+Rundown of each party
+Flat party fee payout
+Tip payout
+Reputation changes
+Dino contracts expire
