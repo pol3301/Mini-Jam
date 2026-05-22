@@ -18,6 +18,7 @@ class DisplayScreen:
         screen.blit(pygame.transform.scale(self.surface, self.display_rect.size), self.display_rect)
 
 dscreen = DisplayScreen(1280, 720)
+game_state = "title_screen"
 
 while running:
     for event in pygame.event.get():
@@ -25,6 +26,17 @@ while running:
             running = False
         if event.type == pygame.WINDOWSIZECHANGED:
             dscreen.update_size([event.x, event.y])
+    
+    if game_state == "title_screen":
+        pass
+    elif game_state == "phase_shop":
+        pass
+    elif game_state == "phase_contracts":
+        pass
+    elif game_state == "phase_admin":
+        pass
+    elif game_state == "phase_results":
+        pass
 
     screen.fill("black")
     dscreen.surface.fill("purple")
