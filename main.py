@@ -25,6 +25,13 @@ dscreen = DisplayScreen(1280, 720)
 game_state = "title_screen"
 sysfont = pygame.freetype.SysFont("arial", 10)
 
+#current run data
+dinos = []
+money = 0
+reputation = 100
+current_day = 1
+
+
 #game state change
 EVENT_GAME_STATE_CHANGE = pygame.event.custom_type()
 
