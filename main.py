@@ -40,7 +40,7 @@ class ShopDino:
     def grab(self):
         self.state = "grabbed"
 
-    def tick(self):
+    def tick(self, mouse_pos):
         current_tick = pygame.time.get_ticks()
 
         if self.state == "roaming":
@@ -56,6 +56,18 @@ class ShopDino:
                 self.stop_roam = current_tick + 250*random.randint(1,4)
                 self.start_roam = current_tick
                 self.direction = [random.randint(-1, 1), random.randint(-1, 1)]
+        
+        if self.state == "grabbed":
+            self.rect.center = mouse_pos
+        
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > 1280:
+            self.rect.right = 1280
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > 720:
+            self.rect.bottom = 720
 
     def draw(self, surface):
         if self.state == "idle":
@@ -67,6 +79,14 @@ class ShopDino:
         elif self.state == "grabbed":
             surface.blit(pygame.transform.rotate(self.image, 45), self.rect)
 
+def adjust_pos_to_display(pos):
+    ratio_x = dscreen.og_rect.w / dscreen.display_rect.w
+    ratio_y = dscreen.og_rect.h / dscreen.display_rect.h
+    adjusted_x = pos[0] - ((screen.get_width() - dscreen.display_rect.w) / 2)
+    adjusted_y = pos[1] - ((screen.get_height() - dscreen.display_rect.h) / 2)
+    adjusted_x = adjusted_x * ratio_x
+    adjusted_y = adjusted_y * ratio_y
+    return int(adjusted_x), int(adjusted_y)
 
 objects = []
 
@@ -74,7 +94,7 @@ mouse_just_pressed = False
 mouse_down = False
 
 while running:
-    mouse_pos = pygame.mouse.get_pos()
+    mouse_pos = adjust_pos_to_display(pygame.mouse.get_pos())
     mouse_just_pressed = False
 
     for event in pygame.event.get():
@@ -101,7 +121,10 @@ while running:
             if i.rect.collidepoint(mouse_pos) and mouse_just_pressed:
                 i.grab()
                 break
-            i.tick()
+            elif not mouse_down and i.state == "grabbed":
+                print("test")
+                i.state = "roaming"
+            i.tick(mouse_pos)
 
     elif game_state == "phase_contracts":
         pass
