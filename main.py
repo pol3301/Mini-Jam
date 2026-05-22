@@ -3,17 +3,22 @@ import pygame.freetype
 import random
 import math
 
+import party
+import constants
+
+
 pygame.init()
 pygame.freetype.init()
 screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+screen = pygame.display.set_mode(constants.SCREEN_SIZE, pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
 
 class DisplayScreen:
-    def __init__(self, width, height):
-        self.surface = pygame.Surface((width, height))
-        self.og_rect = pygame.Rect((0,0), (width, height))
-        self.display_rect = pygame.Rect((0,0), (width, height))
+    def __init__(self, size):
+        self.surface = pygame.Surface(size)
+        self.og_rect = pygame.Rect((0,0), size)
+        self.display_rect = pygame.Rect((0,0), size)
     
     def update_size(self, new_size):
         self.display_rect = self.og_rect.fit(pygame.Rect((0,0), new_size))
@@ -21,7 +26,7 @@ class DisplayScreen:
     def render(self, screen: pygame.Surface):
         screen.blit(pygame.transform.scale(self.surface, self.display_rect.size), self.display_rect)
 
-dscreen = DisplayScreen(1280, 720)
+dscreen = DisplayScreen(constants.SCREEN_SIZE)
 game_state = "title_screen"
 sysfont = pygame.freetype.SysFont("arial", 10)
 
