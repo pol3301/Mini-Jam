@@ -27,11 +27,12 @@ class DisplayScreen:
 
 dscreen = DisplayScreen(constants.SCREEN_SIZE)
 game_state = "title_screen"
-sysfont = pygame.freetype.SysFont("arial", 10)
+sysfont_10 = pygame.freetype.SysFont("arial", 10)
+sysfont_20 = pygame.freetype.SysFont("arial", 20)
 
 #current run data
 dinos = []
-money = 0
+money = 1000
 reputation = 100
 current_day = 1
 
@@ -62,15 +63,47 @@ class BasicText:
 
 #general dino structure
 class DinoCharacter:
-    def __init__(self, name, image, size, traits, recruit_cost, duration):
+    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
         self.name = name
         self.image = pygame.transform.scale(pygame.image.load(image).convert_alpha(), (size, size))
+        self.tier = tier
         self.traits = traits
         self.recruit_cost = recruit_cost
         self.inital_duration = duration
         self.days_remaining = duration
 
-example_dino = DinoCharacter("Placeholder", "assets/dino_placeholder1.png", 200, ["Dumb"], 50, 3)
+class DinoInfoBox:
+    def __init__(self, dino_character: DinoCharacter, rect_pos, rect_size, font: pygame.freetype.Font, bg_color, text_color):
+        self.rect = pygame.rect.Rect(rect_pos, rect_size)
+        self.font = font
+        self.rect_color = bg_color
+        self.text_color = text_color
+        self.dino_c = dino_character
+    
+    def set_dino_character(self, dino_character: DinoCharacter):
+        self.dino_c = dino_character
+    
+    def tick(self):
+        pass
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.rect_color, self.rect)
+        x = self.rect.x
+        y = self.rect.y
+
+        self.font.render_to(surface, (x, y+0), f"Name: {self.dino_c.name}", self.text_color)
+        self.font.render_to(surface, (x, y+20), f"Tier: {self.dino_c.tier}", self.text_color)
+        self.font.render_to(surface, (x, y+40), f"Recruit Cost: {self.dino_c.recruit_cost}", self.text_color)
+        self.font.render_to(surface, (x, y+60), f"Contract Duration: {self.dino_c.days_remaining}", self.text_color)
+        self.font.render_to(surface, (x, y+80), f"Traits:  ", self.text_color)
+        ix = x
+        for i in self.dino_c.traits:
+            ix += self.font.get_rect(None).right
+            #iy = y + 80 + self.font.get_rect(None).y
+            self.font.render_to(surface, (ix, y+80), i, self.text_color)
+            ix += 10
+
+example_dino = DinoCharacter("Placeholder", "assets/dino_placeholder1.png", 200, "Real", ["Dumb", "Stupid", "Jurassic"], 50, 3)
 
 #shop code
 class ShopDino:
@@ -118,7 +151,8 @@ class ShopDino:
             self.rect.bottom = 720
 
     def draw(self, surface):
-        sysfont.render_to(surface, (self.rect.centerx, self.rect.bottom + 20), f"{self.dino_character.recruit_cost}")
+        sysfont_20.render_to(surface, (self.rect.centerx, self.rect.bottom + 20), f"Cost: {self.dino_character.recruit_cost}")
+        sysfont_20.render_to(surface, (self.rect.centerx, self.rect.bottom + 50), f"Contract for: {self.dino_character.inital_duration} day(s)")
         if self.state == "idle":
             surface.blit(self.image, self.rect)
         elif self.state == "roaming":
@@ -140,7 +174,9 @@ def adjust_pos_to_display(pos):
 #shop things
 next_button = BasicSprite("assets/end_shop_button.png", (250, 150), (500, 500))
 buy_basket = BasicSprite("assets/basket.png", (200, 200), (1000, 500))
+money_count_text = BasicText(sysfont_20, (10, 10), "0")
 shop_dinos = []
+dino_info_box = DinoInfoBox(None, (500, 500), (750, 500), sysfont_20, (0,0,0,125), "white")
 
 objects = []
 
@@ -170,23 +206,30 @@ while running:
                     objects.append(i)
                 objects.append(next_button)
                 objects.append(buy_basket)
+                objects.append(money_count_text)
+                objects.append(dino_info_box)
+                dino_info_box.set_dino_character(shop_dinos[0].dino_character)
     
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
 
     elif game_state == "phase_shop":
+        money_count_text.text = str(money)
         for i in shop_dinos:
             if i.rect.collidepoint(mouse_pos) and mouse_just_pressed:
                 i.grab()
                 break
 
             if not mouse_down and i.state == "grabbed":
-                if buy_basket.rect.collidepoint(mouse_pos):
+                if buy_basket.rect.collidepoint(mouse_pos) and i.dino_character.recruit_cost <= money:
+                    money -= i.dino_character.recruit_cost
                     dinos.append(i.dino_character)
                     shop_dinos.remove(i)
                     objects.remove(i)
                 else:
                     i.state = "roaming"
+            elif i.rect.collidepoint(mouse_pos):
+                dino_info_box.set_dino_character(i.dino_character)
 
             i.tick(mouse_pos)
         if mouse_just_pressed and next_button.rect.collidepoint(mouse_pos):
