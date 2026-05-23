@@ -182,22 +182,107 @@ def generate_dinos(amount, day, reputation):
     cutouts = 0
     costumes = 0
     reals = 0
+
     quality = 0
-    returning_dinos = []
+    generated_dinos = []
+
     strong_traits = party.dinosaur_characteristics
     weak_traits = party.dinosaur_characteristics
+
     for i in range(amount):
-        for i in range(day*2 * math.ceil(reputation/50)):
+        for i in range(day * int(reputation/50)):
             quality += random.randint(3, 6)
-        if quality <= 18:
-            cutouts += 1
-        elif quality <= 81:
-            costumes += 1
-        elif quality > 81:
+        if random.randint(1,10) == 10:
             reals += 1
-    #for i in range(cutouts):
-        #if random.randint(1, 5) == 5:
-        #    returning_dinos.append(DinoCharacter())
+        elif quality <= 70:
+            cutouts += 1
+        elif quality <= 140:
+            costumes += 1
+        elif quality > 140:
+            reals += 1
+        print(quality)
+
+    for i in range(cutouts):
+        name = "Placeholder"
+        image = "assets/dino_placeholder1.png"
+        size = 150
+        cost = random.randint(1,3) * 5
+        duration = random.randint(4,6)
+        traits = []
+        for i in range(random.randint(3,5)):
+            if random.randint(1, 5) == 5:
+                traits.append(random.choice(strong_traits))
+                luck = random.randint(0, 3)
+                if luck == 0:
+                    cost = int(cost*1.5)
+                elif luck == 1:
+                    duration -= 1
+            else:
+                traits.append(random.choice(weak_traits))
+                luck = random.randint(0, 2)
+                if luck == 0:
+                    cost = int(cost*0.8)
+                elif luck == 1:
+                    duration += 1
+        if duration <= 0:
+            duration = 1
+        generated_dinos.append(DinoCharacter(name, image, size, "Cutout", traits, cost, duration))
+    
+    for i in range(costumes):
+        name = "Placeholder"
+        image = "assets/dino_placeholder1.png"
+        size = 175
+        cost = random.randint(3,6) * 10
+        duration = random.randint(3,5)
+        traits = []
+        for i in range(random.randint(3,5)):
+            if random.randint(1, 3) == 3:
+                traits.append(random.choice(strong_traits))
+                luck = random.randint(0, 2)
+                if luck == 0:
+                    cost = int(cost*1.25)
+                elif luck == 1:
+                    duration -= 1
+            else:
+                traits.append(random.choice(weak_traits))
+                luck = random.randint(0, 2)
+                if luck == 0:
+                    cost = int(cost*0.7)
+                elif luck == 1:
+                    duration += 1
+        if duration <= 0:
+            duration = 1
+        generated_dinos.append(DinoCharacter(name, image, size, "Costume", traits, cost, duration))
+    
+    for i in range(reals):
+        name = "Placeholder"
+        image = "assets/dino_placeholder1.png"
+        size = 200
+        cost = random.randint(7,15) * 10
+        duration = random.randint(1,4)
+        traits = []
+        for i in range(random.randint(4,6)):
+            if random.randint(1, 5) >= 3:
+                traits.append(random.choice(strong_traits))
+                luck = random.randint(0, 5)
+                if luck == 0:
+                    cost = int(cost*1.2)
+                elif luck == 1:
+                    duration -= 1
+                elif luck == 2:
+                    cost = int(cost*0.9)
+            else:
+                traits.append(random.choice(weak_traits))
+                luck = random.randint(0, 1)
+                if luck == 0:
+                    cost = int(cost*0.8)
+                elif luck == 1:
+                    duration += 1
+        if duration <= 0:
+            duration = 1
+        generated_dinos.append(DinoCharacter(name, image, size, "Real", traits, cost, duration))
+    
+    return generated_dinos
                 
 
 
@@ -223,9 +308,8 @@ while running:
         if event.type == EVENT_GAME_STATE_CHANGE:
             game_state = event.new_state
             if event.new_state == "phase_shop":
-                for i in range(5):
-
-                    shop_dinos.append(ShopDino(example_dino, (random.randint(100, 1180), random.randint(50, 670))))
+                for i in generate_dinos(random.randint(5, 10), current_day, reputation):
+                    shop_dinos.append(ShopDino(i, (random.randint(100, 1180), random.randint(50, 670))))
                 for i in shop_dinos:
                     objects.append(i)
                 objects.append(next_button)
