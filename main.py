@@ -35,6 +35,7 @@ dinos = []
 money = 1000
 reputation = 100
 current_day = 1
+party_contracts = []
 
 
 
@@ -125,8 +126,12 @@ class ShopDino:
         current_tick = pygame.time.get_ticks()
 
         if self.state == "roaming":
-            self.rect.x += self.direction[0] * 2
-            self.rect.y += self.direction[1] * 2
+            if self.dino_character.tier == "Real":
+                self.rect.x += self.direction[0] * 2
+                self.rect.y += self.direction[1] * 2
+            elif self.dino_character.tier == "Costume":
+                self.rect.x += self.direction[0] * 1
+                self.rect.y += self.direction[1] * 1
             if current_tick >= self.stop_roam:
                 self.state = "idle"
                 self.next_roam = current_tick + random.randint(1000, 3000)
@@ -153,7 +158,7 @@ class ShopDino:
     def draw(self, surface):
         sysfont_20.render_to(surface, (self.rect.centerx, self.rect.bottom + 20), f"Cost: {self.dino_character.recruit_cost}")
         sysfont_20.render_to(surface, (self.rect.centerx, self.rect.bottom + 50), f"Contract for: {self.dino_character.inital_duration} day(s)")
-        if self.state == "idle":
+        if self.state == "idle" or self.dino_character.tier == "Cutout":
             surface.blit(self.image, self.rect)
         elif self.state == "roaming":
             tick_progress = pygame.time.get_ticks() - self.start_roam
@@ -207,7 +212,7 @@ def generate_dinos(amount, day, reputation):
         image = "assets/dino_placeholder1.png"
         size = 150
         cost = random.randint(1,3) * 5
-        duration = random.randint(4,6)
+        duration = random.randint(4,8)
         traits = []
         for i in range(random.randint(3,5)):
             if random.randint(1, 5) == 5:
@@ -233,7 +238,7 @@ def generate_dinos(amount, day, reputation):
         image = "assets/dino_placeholder1.png"
         size = 175
         cost = random.randint(3,6) * 10
-        duration = random.randint(3,5)
+        duration = random.randint(4,6)
         traits = []
         for i in range(random.randint(3,5)):
             if random.randint(1, 3) == 3:
@@ -259,7 +264,7 @@ def generate_dinos(amount, day, reputation):
         image = "assets/dino_placeholder1.png"
         size = 200
         cost = random.randint(7,15) * 10
-        duration = random.randint(1,4)
+        duration = random.randint(1,3)
         traits = []
         for i in range(random.randint(4,6)):
             if random.randint(1, 5) >= 3:
@@ -269,8 +274,6 @@ def generate_dinos(amount, day, reputation):
                     cost = int(cost*1.2)
                 elif luck == 1:
                     duration -= 1
-                elif luck == 2:
-                    cost = int(cost*0.9)
             else:
                 traits.append(random.choice(weak_traits))
                 luck = random.randint(0, 1)
@@ -317,6 +320,8 @@ while running:
                 objects.append(money_count_text)
                 objects.append(dino_info_box)
                 dino_info_box.set_dino_character(shop_dinos[0].dino_character)
+            elif event.new_state == "phase_admim":
+                party_contracts = []
     
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
@@ -327,8 +332,7 @@ while running:
             if i.rect.collidepoint(mouse_pos) and mouse_just_pressed:
                 i.grab()
                 break
-
-            if not mouse_down and i.state == "grabbed":
+            elif not mouse_down and i.state == "grabbed":
                 if buy_basket.rect.collidepoint(mouse_pos) and i.dino_character.recruit_cost <= money:
                     money -= i.dino_character.recruit_cost
                     dinos.append(i.dino_character)
