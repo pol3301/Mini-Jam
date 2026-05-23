@@ -1,4 +1,5 @@
 import pygame
+import pygame.freetype
 import random
 
 
@@ -6,6 +7,16 @@ import constants
 
 # SCREEN_SIZE = (1280, 720)
 
+class BasicText:
+    def __init__(self, font: pygame.freetype.Font, pos, text, color="black"):
+        self.font = font
+        self.pos = pos
+        self.text = text
+        self.color = color
+    def tick(self):
+        pass
+    def draw(self, surface):
+        self.font.render_to(surface, self.pos, self.text, fgcolor=self.color)
 
 class Kid:
     def __init__(self, favourite_ranking, is_host):
@@ -70,11 +81,24 @@ class Party:
     def draw_audience(self, surface):
         surface.blit(self.audience_image, self.audience_image.get_rect(topleft=(90,420)))
 
+class PartyContractsList:
+    def __init__(self, parties):
+        print("party contract list")
+        self.party_box_list = []
+        for i in range(len(parties)):
+            self.party_box_list.append(PartyBox(parties[i], i))
+
+    def tick(self):
+        pass
+    
+    def draw(self, surface: pygame.Surface):
+        for i in self.party_box_list:
+            i.draw(surface)
+
 class PartyBox:
     def __init__(self, party, index):
         self.party = party
         self.index = index
-        pass
     
     def draw(self, surface):
         y = 20 + 210 * self.index
@@ -91,7 +115,9 @@ class PartyBox:
                 kid.draw(surface, x, y)
 
     def draw_stats(self, surface):
-        from main import BasicText, sysfont_10, sysfont_20
+        sysfont_10 = pygame.freetype.SysFont("arial", 10)
+        sysfont_20 = pygame.freetype.SysFont("arial", 20)
+
         y = 30 + 210 * self.index
         name = BasicText(sysfont_20, (270, y), "Henry's party")
         y += 30
@@ -106,7 +132,6 @@ class PartyBox:
         econ_stat.draw(surface)
         kid_count.draw(surface)
         minimum_pay.draw(surface)
-        pass
 
 #
 # party_size = random.randint(3,8)

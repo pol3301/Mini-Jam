@@ -184,6 +184,46 @@ class ShopDino:
         elif self.state == "grabbed":
             surface.blit(pygame.transform.rotate(self.image, 45), self.rect)
 
+#admin phase code
+class DinoInfoBlock:
+    def __init__(self, pos, dino_character: DinoCharacter):
+        self.rect = pygame.Rect(pos, (200, 100))
+        self.dino_image = dino_character.image
+        self.dino_character = dino_character
+        self.name_text = BasicText(mont_15, (self.rect.x, self.rect.y), str(dino_character.name))
+        self.tier_text = BasicText(mont_15, (self.rect.x, self.rect.y+20), str(dino_character.tier))
+        traits_text = ""
+        for i in dino_character.traits:
+            traits_text += f"{i}  "
+        self.traits_text = BasicText(mont_15, (self.rect.x, self.rect.y+40), str(traits_text))
+        self.days_text = BasicText(mont_15, (self.rect.x, self.rect.y+60), str(dino_character.days_remaining))
+        self.selected = False
+    
+    def tick(self):
+        pass
+
+    def draw(self, surface: pygame.Surface):
+        pygame.draw.rect(surface, "white", self.rect)
+        surface.blit(self.dino_image, self.rect)
+        self.name_text.draw(surface)
+        self.tier_text.draw(surface)
+        self.traits_text.draw(surface)
+        self.days_text.draw(surface)
+
+class DinoList:
+    def __init__(self, dino_character_list):
+        self.dino_list = []
+        for i in range(len(dino_character_list)):
+            self.dino_list.append(DinoInfoBlock((0, i*100), dino_character_list[i]))
+    
+    def tick(self):
+        pass
+    
+    def draw(self, surface: pygame.Surface):
+        for i in self.dino_list:
+            i.draw(surface)
+
+
 def adjust_pos_to_display(pos):
     ratio_x = dscreen.og_rect.w / dscreen.display_rect.w
     ratio_y = dscreen.og_rect.h / dscreen.display_rect.h
@@ -200,6 +240,10 @@ money_count_text = BasicText(mont_bold_30, (10, 10), "0", "white")
 shop_dinos = []
 dino_info_box = DinoInfoBox(None, (640, 360), (450, 300), mont_bold_30, (0,0,0,125), "white")
 shop_floor = BasicSprite("assets/stone_floor.png", (1280, 720), (0, 0), False)
+
+#admin phase things
+dino_list = DinoList([])
+gray_backdrop = BasicSprite("assets/backdrop.png", (1280, 720), (0, 0), False)
 
 def generate_dinos(amount, day, reputation):
     cutouts = 0
@@ -223,7 +267,6 @@ def generate_dinos(amount, day, reputation):
             costumes += 1
         elif quality > 140:
             reals += 1
-        print(quality)
 
     for i in range(cutouts):
         name = "Placeholder"
@@ -327,6 +370,8 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_down = False
         if event.type == EVENT_GAME_STATE_CHANGE:
+            for i in range(len(objects)):
+                objects.pop(0)
             game_state = event.new_state
             if event.new_state == "phase_shop":
                 objects.append(shop_floor)
@@ -339,8 +384,12 @@ while running:
                 objects.append(money_count_text)
                 objects.append(dino_info_box)
                 dino_info_box.set_dino_character(shop_dinos[0].dino_character)
-            elif event.new_state == "phase_admim":
-                party_contracts = []
+            elif event.new_state == "phase_admin":
+                dino_list = DinoList(dinos)
+                objects.append(gray_backdrop)
+                objects.append(dino_list)
+                party_contracts = [party.Party(3), party.Party(5)]
+                objects.append(party.PartyContractsList(party_contracts))
     
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
