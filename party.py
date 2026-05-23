@@ -1,29 +1,32 @@
 import pygame
 import random
 
+
 import constants
 
 # SCREEN_SIZE = (1280, 720)
 
-dinosaur_characteristics = [
-    "Tall", "Fast", "Flying", "Strong", "Herbivore", "Horns", "Water", "Armoured" 
-]
 
 class Kid:
     def __init__(self, favourite_ranking, is_host):
-        self.favourite_characteristics = random.sample(dinosaur_characteristics, 2)
+        self.favourite_characteristics = random.sample(constants.dinosaur_characteristics, 2)
             
         self.favourite_ranking = favourite_ranking 
         self.is_host = is_host
+        self.audience_image = pygame.transform.scale(pygame.image.load("assets/kid1.png").convert_alpha(), (180,180))
+        
+    def draw(self, surface, x, y):
+        surface.blit(self.audience_image, self.audience_image.get_rect(topleft=(x,y)))
 
 class Dino:
     def __init__(self):
         self.base_earn = random.randint(2,9)
         
-        self.characteristics = random.sample(dinosaur_characteristics, 2)
+        self.characteristics = random.sample(constants.dinosaur_characteristics, 2)
 
 class Party:
     stage_path = "assets/stage.png"
+    audience_path = "assets/audience.png"
     
     def __init__(self, kid_count, dino_count):
         self.party_kids = [Kid(1, True)]
@@ -34,7 +37,8 @@ class Party:
         for i in range(dino_count):
             self.party_dinos.append(Dino())
             
-        self.stage = pygame.transform.scale(pygame.image.load(self.stage_path).convert_alpha(), constants.SCREEN_SIZE)
+        self.stage_image = pygame.transform.scale(pygame.image.load(self.stage_path).convert_alpha(), constants.SCREEN_SIZE)
+        self.audience_image = pygame.transform.scale(pygame.image.load(self.audience_path).convert_alpha(), (1280/1.5,720/1.5))
 
     def calculate_earn(self):
         party_earn = 0
@@ -56,18 +60,53 @@ class Party:
 
         return party_earn
 
-    def draw_party(self, surface):
+    def draw(self, surface):
         self.draw_stage(surface)
-        pass
+        self.draw_audience(surface)
         
     def draw_stage(self, surface):
-        surface.blit(self.stage, self.stage.get_rect(topleft=(0,0)))
-        pass
+        surface.blit(self.stage_image, self.stage_image.get_rect(topleft=(0,0)))
         
-    def draw_audience(self):
+    def draw_audience(self, surface):
+        surface.blit(self.audience_image, self.audience_image.get_rect(topleft=(90,420)))
+
+class PartyBox:
+    def __init__(self, party, index):
+        self.party = party
+        self.index = index
         pass
+    
+    def draw(self, surface):
+        y = 20 + 210 * self.index
+        
+        rect = pygame.Rect(50, y, 1180, 200)
+        pygame.draw.rect(surface, pygame.Color(31, 221, 255), rect)
+        self.draw_mugshot(surface)
+        self.draw_stats(surface)
 
+    def draw_mugshot(self, surface):
+        x, y = 70, 30 + 210 * self.index
+        for kid in self.party.party_kids:
+            if kid.is_host:
+                kid.draw(surface, x, y)
 
+    def draw_stats(self, surface):
+        from main import BasicText, sysfont_10, sysfont_20
+        y = 30 + 210 * self.index
+        name = BasicText(sysfont_20, (270, y), "Henry's party")
+        y += 30
+        econ_stat = BasicText(sysfont_10, (270, y), "Socioeconomical status: Poor")
+        y += 20
+        kid_count = BasicText(sysfont_10, (270, y), "Invited Kids: 5")
+        y += 20
+        minimum_pay = BasicText(sysfont_10, (270, y), "Minimum Pay : 20")
+        y += 20
+        
+        name.draw(surface)
+        econ_stat.draw(surface)
+        kid_count.draw(surface)
+        minimum_pay.draw(surface)
+        pass
 
 #
 # party_size = random.randint(3,8)
