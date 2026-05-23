@@ -28,17 +28,17 @@ class Party:
     stage_path = "assets/stage.png"
     audience_path = "assets/audience.png"
     
-    def __init__(self, kid_count, dino_count):
+    def __init__(self, kid_count):
         self.party_kids = [Kid(1, True)]
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
-        self.party_dinos:list[Dino] = []
-
-        for i in range(dino_count):
-            self.party_dinos.append(Dino())
+        self.party_dinos:list[Dino] = [None, None, None]
             
         self.stage_image = pygame.transform.scale(pygame.image.load(self.stage_path).convert_alpha(), constants.SCREEN_SIZE)
         self.audience_image = pygame.transform.scale(pygame.image.load(self.audience_path).convert_alpha(), (1280/1.5,720/1.5))
+
+    def set_dino(self, index, dino_character):
+        self.party_dinos[index] = dino_character
 
     def calculate_earn(self):
         party_earn = 0
