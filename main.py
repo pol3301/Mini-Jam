@@ -29,6 +29,10 @@ dscreen = DisplayScreen(constants.SCREEN_SIZE)
 game_state = "title_screen"
 sysfont_10 = pygame.freetype.SysFont("arial", 10)
 sysfont_20 = pygame.freetype.SysFont("arial", 20)
+budget_30 = pygame.freetype.Font("assets/BUDGETSTEN-BLED.ttf", 30)
+mont_30 = pygame.freetype.Font("assets/Mont-ExtraLightDEMO.otf", 30)
+mont_bold_30 = pygame.freetype.Font("assets/Mont-HeavyDEMO.otf", 30)
+mont_15 = pygame.freetype.Font("assets/Mont-ExtraLightDEMO.otf", 15)
 
 #current run data
 dinos = []
@@ -156,8 +160,8 @@ class ShopDino:
             self.rect.bottom = 720
 
     def draw(self, surface):
-        sysfont_20.render_to(surface, (self.rect.centerx, self.rect.bottom + 20), f"Cost: {self.dino_character.recruit_cost}")
-        sysfont_20.render_to(surface, (self.rect.centerx, self.rect.bottom + 50), f"Contract for: {self.dino_character.inital_duration} day(s)")
+        mont_15.render_to(surface, (self.rect.centerx, self.rect.bottom + 20), f"Cost: {self.dino_character.recruit_cost}")
+        mont_15.render_to(surface, (self.rect.centerx, self.rect.bottom + 50), f"For: {self.dino_character.inital_duration} day(s)")
         if self.state == "idle" or self.dino_character.tier == "Cutout":
             surface.blit(self.image, self.rect)
         elif self.state == "roaming":
@@ -179,7 +183,7 @@ def adjust_pos_to_display(pos):
 #shop things
 next_button = BasicSprite("assets/end_shop_button.png", (250, 150), (500, 500))
 buy_basket = BasicSprite("assets/basket.png", (200, 200), (1000, 500))
-money_count_text = BasicText(sysfont_20, (10, 10), "0")
+money_count_text = BasicText(mont_bold_30, (10, 10), "0")
 shop_dinos = []
 dino_info_box = DinoInfoBox(None, (500, 500), (750, 500), sysfont_20, (0,0,0,125), "white")
 
