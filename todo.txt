@@ -27,6 +27,24 @@ Three dinos max per party
 
 Results Phase:
 
+PAULLLLLLLL:
+Dear Paul,
+Fuck you
+You are by far the most frustrating, dim-witted, (less commonly) dimwitted, simple-minded, embarrasing, manlet excuse of a person.
+I sincerely hope a train runs you over
+I will only take these words back if you:
+Implement the results phase.
+For every party, go one-by-one showing their backdrop, the dinos the player assigned, and how much the party liked it
+Then give the flat fee for the party, and the tip
+Then, show the next party's rundown 
+Finally, change the player's reputation depending on how well they did on tips (same system basically)
+Remember to take the party contracts from the "party_contracts" list variable, since that's where I'll be putting them
+after the admin phase
+Then, if you have the time between jerking off and binging Netflix, add a [TITLE CARD].
+Many pleases and thank you's,
+Sincerely,
+Bitch
+
 Rundown of each party
 Flat party fee payout
 Tip payout
