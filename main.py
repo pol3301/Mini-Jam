@@ -209,8 +209,8 @@ def generate_dinos(amount, day, reputation):
     quality = 0
     generated_dinos = []
 
-    strong_traits = party.dinosaur_characteristics
-    weak_traits = party.dinosaur_characteristics
+    strong_traits = constants.dinosaur_characteristics
+    weak_traits = constants.dinosaur_characteristics
 
     for i in range(amount):
         for i in range(day * int(reputation/50)):
