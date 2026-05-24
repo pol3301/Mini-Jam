@@ -388,7 +388,7 @@ while running:
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
                 objects.append(dino_list)
-                party_contracts = [party.Party(3), party.Party(5)]
+                party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
                 objects.append(party.PartyContractsList(party_contracts, (640, 30), True))
     
     if game_state == "title_screen":

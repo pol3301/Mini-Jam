@@ -39,7 +39,9 @@ class Party:
     stage_path = "assets/stage.png"
     audience_path = "assets/audience.png"
     
-    def __init__(self, kid_count):
+    def __init__(self, price, budget: int, kid_count):
+        self.price = price
+        self.budget = budget
         self.party_kids = [Kid(1, True)]
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
@@ -102,7 +104,7 @@ class PartyContractsList:
             i.draw(surface, self.pos[0], self.pos[1])
 
 class PartyBox:
-    def __init__(self, party, index, size):
+    def __init__(self, party: Party, index, size):
         self.party = party
         self.index = index
         self.size = size
@@ -128,11 +130,20 @@ class PartyBox:
         y = starting_y + 210 * self.index
         name = BasicText(sysfont_20, (x, y), "Henry's party")
         y += 30
-        econ_stat = BasicText(sysfont_10, (x, y), "Budget: Low")
+        budget = ""
+        if self.party.budget == 0:
+            budget = "Low"
+        elif self.party.budget == 1:
+            budget == "Average"
+        elif self.party.budget == 2:
+            budget == "High"
+        elif self.party.budget >= 3:
+            budget == "Endless"
+        econ_stat = BasicText(sysfont_10, (x, y), f"Budget: {budget}")
         y += 20
-        kid_count = BasicText(sysfont_10, (x, y), "Invited Kids: 5")
+        kid_count = BasicText(sysfont_10, (x, y), f"Number of Guests: {len(self.party.party_kids)}")
         y += 20
-        minimum_pay = BasicText(sysfont_10, (x, y), "Pay (before tip): 20")
+        minimum_pay = BasicText(sysfont_10, (x, y), f"Pay (before tip): {self.party.price}")
         y += 20
 
         host_favs = ""
@@ -144,7 +155,7 @@ class PartyBox:
                     host_favs += f"{j}  "
             else:
                 for j in i.favourite_characteristics:
-                    if not j in guest_favs:
+                    if not j in guest_favs_list:
                         guest_favs_list.append(j)
         for i in guest_favs_list:
             guest_favs += f"{i}  "
