@@ -52,7 +52,14 @@ class Party:
     stage_path = "assets/stage.png"
     audience_path = "assets/audience.png"
 
+<<<<<<< HEAD
     def __init__(self, kid_count):
+=======
+    def __init__(self, price, budget: int, kid_count):
+        self.price = price
+        self.budget = budget
+
+>>>>>>> tmp-fix
         self.party_kids = [Kid(1, True)]
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
@@ -107,24 +114,32 @@ class Party:
 
 
 class PartyContractsList:
-    def __init__(self, parties):
+    def __init__(self, parties, pos, is_owned=False):
         print("party contract list")
         self.party_box_list = []
+        self.is_owned = is_owned
+        self.pos = pos
+        if is_owned:
+            box_size = (630, 200)
+        else:
+            box_size = (1180, 200)
         for i in range(len(parties)):
-            self.party_box_list.append(PartyBox(parties[i], i))
+            self.party_box_list.append(PartyBox(parties[i], i, box_size))
 
     def tick(self):
         pass
 
     def draw(self, surface: pygame.Surface):
         for i in self.party_box_list:
-            i.draw(surface)
+            i.draw(surface, self.pos[0], self.pos[1])
+
 
 
 class PartyBox:
-    def __init__(self, party, index):
+    def __init__(self, party: Party, index, size):
         self.party = party
         self.index = index
+<<<<<<< HEAD
 
     def draw(self, surface: pygame.surface.Surface):
         y = 20 + 210 * self.index
@@ -136,28 +151,152 @@ class PartyBox:
 
     def draw_mugshot(self, surface, party):
         x, y = 70, 30 + 210 * self.index
+=======
+        self.size = size
+
+    def draw(self, surface, x, starting_y):
+        y = starting_y + 210 * self.index
+
+        # rect = pygame.Rect(50, y, 1180, 200)
+        pygame.draw.rect(surface, pygame.Color(31, 221, 255), ((x, y), self.size))
+        self.draw_mugshot(surface, x + 30, starting_y + 10)
+        self.draw_stats(surface, x + 230, starting_y + 10)
+
+    def draw_mugshot(self, surface, x, starting_y):
+        x, y = x, starting_y + 210 * self.index
+>>>>>>> tmp-fix
         for kid in self.party.party_kids:
             if kid.is_host:
                 kid.draw(surface, x, y)
 
-    def draw_stats(self, surface):
+    def draw_stats(self, surface, x, starting_y):
         sysfont_10 = pygame.freetype.SysFont("arial", 10)
         sysfont_20 = pygame.freetype.SysFont("arial", 20)
 
-        y = 30 + 210 * self.index
-        name = BasicText(sysfont_20, (270, y), "Henry's party")
+        y = starting_y + 210 * self.index
+        name = BasicText(sysfont_20, (x, y), "Henry's party")
         y += 30
-        econ_stat = BasicText(sysfont_10, (270, y), "Socioeconomical status: Poor")
+        budget = ""
+        if self.party.budget == 0:
+            budget = "Low"
+        elif self.party.budget == 1:
+            budget == "Average"
+        elif self.party.budget == 2:
+            budget == "High"
+        elif self.party.budget >= 3:
+            budget == "Endless"
+        econ_stat = BasicText(sysfont_10, (x, y), f"Budget: {budget}")
         y += 20
-        kid_count = BasicText(sysfont_10, (270, y), "Invited Kids: 5")
+        kid_count = BasicText(
+            sysfont_10, (x, y), f"Number of Guests: {len(self.party.party_kids)}"
+        )
         y += 20
-        minimum_pay = BasicText(sysfont_10, (270, y), "Minimum Pay : 20")
+        minimum_pay = BasicText(
+            sysfont_10, (x, y), f"Pay (before tip): {self.party.price}"
+        )
         y += 20
 
+<<<<<<< HEAD
+=======
+        host_favs = ""
+        guest_favs_list = []
+        guest_favs = ""
+        for i in self.party.party_kids:
+            if i.is_host:
+                for j in i.favourite_characteristics:
+                    host_favs += f"{j}  "
+            else:
+                for j in i.favourite_characteristics:
+                    if not j in guest_favs_list:
+                        guest_favs_list.append(j)
+        for i in guest_favs_list:
+            guest_favs += f"{i}  "
+
+        host_fav_characteristics = BasicText(
+            sysfont_10, (x, y), f"Henry likes dinos that are: {host_favs}"
+        )
+        y += 20
+        guest_fav_characteristics = BasicText(
+            sysfont_10, (x, y), f"The guests like dinos that are: {guest_favs}"
+        )
+
+>>>>>>> tmp-fix
         name.draw(surface)
         econ_stat.draw(surface)
         kid_count.draw(surface)
         minimum_pay.draw(surface)
+        host_fav_characteristics.draw(surface)
+        guest_fav_characteristics.draw(surface)
+
+
+class Star:
+    def __init__(self):
+        self.image = pygame.transform.scale(
+            pygame.image.load("assets/star.png").convert_alpha(), (100, 100)
+        )
+
+    def draw(
+        self,
+        surface: pygame.Surface,
+        x,
+        y,
+    ):
+        surface.blit(self.image, self.image.get_rect(topleft=(x, y)))
+
+
+class Results:
+    def __init__(self, parties: list[Party]):
+        self.parties = parties
+
+    def draw(self, surface: pygame.surface.Surface):
+
+        for i, party in enumerate(self.parties):
+            y = 20 + 210 * i
+            rect = pygame.Rect(50, y, 1180, 200)
+            pygame.draw.rect(surface, box_blue, rect)
+
+            self.draw_mugshots(surface, i, party)
+            self.draw_stats(surface, i, party)
+            self.draw_populartiy(surface, 5, i)
+
+    def draw_mugshots(self, surface: pygame.Surface, i, party: Party):
+        x, y = 70, 30 + 210 * i
+        for kid in party.party_kids:
+            if kid.is_host:
+                kid.draw(surface, x, y)
+                return
+        pass
+
+    def draw_stats(self, surface: pygame.Surface, i, party: Party):
+        font_10 = pygame.freetype.SysFont("arial", 10)
+        font_20 = pygame.freetype.SysFont("arial", 20)
+
+        tip = math.trunc(party.calculate_tip())
+
+        y = 30 + 210 * i
+        name_text = BasicText(font_20, (270, y), f"{party.host_name}'s party")
+        y += 60
+        base_pay_text = BasicText(font_10, (270, y), f"Base pay: {party.base_pay}")
+        y += 20
+        tip_pay_text = BasicText(font_10, (270, y), f"Tip pay: {tip}")
+        y += 20
+        total_pay_text = BasicText(
+            font_10, (270, y), f"Total pay: {tip + party.base_pay}"
+        )
+
+        name_text.draw(surface)
+        base_pay_text.draw(surface)
+        total_pay_text.draw(surface)
+        tip_pay_text.draw(surface)
+
+        # TODO:
+
+    def draw_populartiy(self, surface: pygame.Surface, popularity_rating: int, i):
+        y = 80 + 210 * i
+        for star in range(popularity_rating):
+            x = 600 + 120 * star
+            Star().draw(surface, x, y)
+
 
 
 class Star:

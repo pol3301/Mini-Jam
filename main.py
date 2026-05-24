@@ -482,19 +482,21 @@ while running:
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
                 objects.append(dino_list)
-                party_contracts = [party.Party(3), party.Party(5)]
-                objects.append(party.PartyContractsList(party_contracts))
+                party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
+                objects.append(
+                    party.PartyContractsList(party_contracts, (640, 30), True)
+                )
 
             elif event.new_state == "phase_results":
-                test_party1 = party.Party(8)
-                test_party2 = party.Party(8)
-                test_party3 = party.Party(8)
+                test_party1 = party.Party(100, 0, 3)
+                test_party2 = party.Party(100, 0, 5)
+                test_party3 = party.Party(100, 0, 7)
 
                 results = party.Results([test_party1, test_party2, test_party3])
                 objects.append(results)
 
             elif event.new_state == "party_animation":
-                objects.append(party.Party(8))
+                objects.append(party.Party(100, 0, 3))
 
     if game_state == "title_screen":
         pygame.event.post(
