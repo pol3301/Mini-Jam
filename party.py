@@ -82,50 +82,57 @@ class Party:
         surface.blit(self.audience_image, self.audience_image.get_rect(topleft=(90,420)))
 
 class PartyContractsList:
-    def __init__(self, parties):
+    def __init__(self, parties, pos, is_owned=False):
         print("party contract list")
         self.party_box_list = []
+        self.is_owned = is_owned
+        self.pos = pos
+        if is_owned:
+            box_size = (630, 200)
+        else:
+            box_size = (1180, 200)
         for i in range(len(parties)):
-            self.party_box_list.append(PartyBox(parties[i], i))
+            self.party_box_list.append(PartyBox(parties[i], i, box_size))
 
     def tick(self):
         pass
     
     def draw(self, surface: pygame.Surface):
         for i in self.party_box_list:
-            i.draw(surface)
+            i.draw(surface, self.pos[0], self.pos[1])
 
 class PartyBox:
-    def __init__(self, party, index):
+    def __init__(self, party, index, size):
         self.party = party
         self.index = index
+        self.size = size
     
-    def draw(self, surface):
-        y = 20 + 210 * self.index
+    def draw(self, surface, x, starting_y):
+        y = starting_y + 210 * self.index
         
-        rect = pygame.Rect(50, y, 1180, 200)
-        pygame.draw.rect(surface, pygame.Color(31, 221, 255), rect)
-        self.draw_mugshot(surface)
-        self.draw_stats(surface)
+        #rect = pygame.Rect(50, y, 1180, 200)
+        pygame.draw.rect(surface, pygame.Color(31, 221, 255), ((x, y), self.size))
+        self.draw_mugshot(surface, x + 30, starting_y + 10)
+        self.draw_stats(surface, x + 30, starting_y + 10)
 
-    def draw_mugshot(self, surface):
-        x, y = 70, 30 + 210 * self.index
+    def draw_mugshot(self, surface, x, starting_y):
+        x, y = x, starting_y + 210 * self.index
         for kid in self.party.party_kids:
             if kid.is_host:
                 kid.draw(surface, x, y)
 
-    def draw_stats(self, surface):
+    def draw_stats(self, surface, x, starting_y):
         sysfont_10 = pygame.freetype.SysFont("arial", 10)
         sysfont_20 = pygame.freetype.SysFont("arial", 20)
 
-        y = 30 + 210 * self.index
-        name = BasicText(sysfont_20, (270, y), "Henry's party")
+        y = starting_y + 210 * self.index
+        name = BasicText(sysfont_20, (x, y), "Henry's party")
         y += 30
-        econ_stat = BasicText(sysfont_10, (270, y), "Socioeconomical status: Poor")
+        econ_stat = BasicText(sysfont_10, (x, y), "Socioeconomical status: Poor")
         y += 20
-        kid_count = BasicText(sysfont_10, (270, y), "Invited Kids: 5")
+        kid_count = BasicText(sysfont_10, (x, y), "Invited Kids: 5")
         y += 20
-        minimum_pay = BasicText(sysfont_10, (270, y), "Minimum Pay : 20")
+        minimum_pay = BasicText(sysfont_10, (x, y), "Minimum Pay : 20")
         y += 20
         
         name.draw(surface)

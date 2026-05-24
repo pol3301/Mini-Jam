@@ -389,7 +389,7 @@ while running:
                 objects.append(gray_backdrop)
                 objects.append(dino_list)
                 party_contracts = [party.Party(3), party.Party(5)]
-                objects.append(party.PartyContractsList(party_contracts))
+                objects.append(party.PartyContractsList(party_contracts, (640, 30), True))
     
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
