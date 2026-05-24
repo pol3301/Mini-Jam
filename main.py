@@ -34,6 +34,7 @@ mont_30 = pygame.freetype.Font("assets/Mont-ExtraLightDEMO.otf", 30)
 mont_bold_30 = pygame.freetype.Font("assets/Mont-HeavyDEMO.otf", 30)
 mont_15 = pygame.freetype.Font("assets/Mont-ExtraLightDEMO.otf", 15)
 mont_bold_15 = pygame.freetype.Font("assets/Mont-HeavyDEMO.otf", 15)
+mont_bold_10 = pygame.freetype.Font("assets/Mont-HeavyDEMO.otf", 10)
 
 #current run data
 dinos = []
@@ -187,34 +188,58 @@ class ShopDino:
 #admin phase code
 class DinoInfoBlock:
     def __init__(self, pos, dino_character: DinoCharacter):
-        self.rect = pygame.Rect(pos, (200, 100))
-        self.dino_image = dino_character.image
+        self.rect = pygame.Rect(pos, (305, 120))
+        x, y = self.rect.topleft
+        self.dino_image = pygame.transform.scale(dino_character.image, (100, 100))
         self.dino_character = dino_character
-        self.name_text = BasicText(mont_15, (self.rect.x, self.rect.y), str(dino_character.name))
-        self.tier_text = BasicText(mont_15, (self.rect.x, self.rect.y+20), str(dino_character.tier))
+        self.name_text = BasicText(mont_15, (120 + x, y+10), str(dino_character.name))
+        self.tier_text = BasicText(mont_15, (120 + x, y+30), str(dino_character.tier))
+        self.days_text = BasicText(mont_15, (120 + x, y+50), str(dino_character.days_remaining))
+
         traits_text = ""
+        traits_overflow = ""
         for i in dino_character.traits:
-            traits_text += f"{i}  "
-        self.traits_text = BasicText(mont_15, (self.rect.x, self.rect.y+40), str(traits_text))
-        self.days_text = BasicText(mont_15, (self.rect.x, self.rect.y+60), str(dino_character.days_remaining))
+            new_text = f"{i}  "
+            if len(traits_text) <= 34 - len(new_text):
+                traits_text += new_text
+            else:
+                traits_overflow += new_text
+        self.traits_text = BasicText(mont_bold_10, (120 + x, y+70), str(traits_text))
+        self.traits_overflow_text = BasicText(mont_bold_10, (120 + x, y+90), str(traits_overflow))
         self.selected = False
     
     def tick(self):
         pass
 
     def draw(self, surface: pygame.Surface):
+        x, y = self.rect.topleft
         pygame.draw.rect(surface, "white", self.rect)
-        surface.blit(self.dino_image, self.rect)
+        surface.blit(self.dino_image, (x + 10, y + 10))
         self.name_text.draw(surface)
         self.tier_text.draw(surface)
         self.traits_text.draw(surface)
+        self.traits_overflow_text.draw(surface)
         self.days_text.draw(surface)
 
 class DinoList:
     def __init__(self, dino_character_list):
         self.dino_list = []
         for i in range(len(dino_character_list)):
-            self.dino_list.append(DinoInfoBlock((0, i*100), dino_character_list[i]))
+            if i % 2 == 0:
+                self.dino_list.append(DinoInfoBlock((10, 10+(i/2)*130), dino_character_list[i]))
+            else:
+                self.dino_list.append(DinoInfoBlock((325, 10+math.floor(i/2)*130), dino_character_list[i]))
+    
+    def reorder_blocks(self):
+        dino_character_list = []
+        for i in self.dino_list:
+            dino_character_list.append(i.dino_character)
+        self.dino_list = []
+        for i in range(len(dino_character_list)):
+            if i % 2 == 0:
+                self.dino_list.append(DinoInfoBlock((10, 10+(i/2)*130), dino_character_list[i]))
+            else:
+                self.dino_list.append(DinoInfoBlock((325, 10+math.floor(i/2)*130), dino_character_list[i]))
     
     def tick(self):
         pass
@@ -244,6 +269,7 @@ shop_floor = BasicSprite("assets/stone_floor.png", (1280, 720), (0, 0), False)
 #admin phase things
 dino_list = DinoList([])
 gray_backdrop = BasicSprite("assets/backdrop.png", (1280, 720), (0, 0), False)
+party_contracts_list = None
 
 def generate_dinos(amount, day, reputation):
     cutouts = 0
@@ -354,10 +380,12 @@ objects = []
 
 mouse_just_pressed = False
 mouse_down = False
+key_just_pressed = False
 
 while running:
     mouse_pos = adjust_pos_to_display(pygame.mouse.get_pos())
     mouse_just_pressed = False
+    key_just_pressed = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -369,6 +397,8 @@ while running:
             mouse_down = True
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_down = False
+        if event.type == pygame.KEYDOWN:
+            key_just_pressed = True
         if event.type == EVENT_GAME_STATE_CHANGE:
             for i in range(len(objects)):
                 objects.pop(0)
@@ -389,8 +419,11 @@ while running:
                 objects.append(gray_backdrop)
                 objects.append(dino_list)
                 party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
-                objects.append(party.PartyContractsList(party_contracts, (640, 30), True))
+                party_contracts_list = party.PartyContractsList(party_contracts, (640, 10), True)
+                objects.append(party_contracts_list)
     
+    keys = pygame.key.get_pressed()
+
     if game_state == "title_screen":
         pygame.event.post(pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop"))
 
@@ -424,7 +457,19 @@ while running:
         pass
 
     elif game_state == "phase_admin":
-        pass
+        if keys[pygame.K_UP] and key_just_pressed:
+            dino_list.dino_list.append(dino_list.dino_list.pop(0))
+            dino_list.reorder_blocks()
+        elif keys[pygame.K_DOWN] and key_just_pressed:
+            dino_list.dino_list.insert(0, dino_list.dino_list.pop(-1))
+            dino_list.reorder_blocks()
+        if mouse_just_pressed:
+            for i in dino_list.dino_list:
+                i.selected = False
+            for i in dino_list.dino_list:
+                if i.rect.collidepoint(mouse_pos):
+                    i.selected = True
+                    break
 
     elif game_state == "phase_results":
         pass
