@@ -113,7 +113,7 @@ class PartyBox:
         #rect = pygame.Rect(50, y, 1180, 200)
         pygame.draw.rect(surface, pygame.Color(31, 221, 255), ((x, y), self.size))
         self.draw_mugshot(surface, x + 30, starting_y + 10)
-        self.draw_stats(surface, x + 30, starting_y + 10)
+        self.draw_stats(surface, x + 230, starting_y + 10)
 
     def draw_mugshot(self, surface, x, starting_y):
         x, y = x, starting_y + 210 * self.index
@@ -128,17 +128,37 @@ class PartyBox:
         y = starting_y + 210 * self.index
         name = BasicText(sysfont_20, (x, y), "Henry's party")
         y += 30
-        econ_stat = BasicText(sysfont_10, (x, y), "Socioeconomical status: Poor")
+        econ_stat = BasicText(sysfont_10, (x, y), "Budget: Low")
         y += 20
         kid_count = BasicText(sysfont_10, (x, y), "Invited Kids: 5")
         y += 20
-        minimum_pay = BasicText(sysfont_10, (x, y), "Minimum Pay : 20")
+        minimum_pay = BasicText(sysfont_10, (x, y), "Pay (before tip): 20")
         y += 20
+
+        host_favs = ""
+        guest_favs_list = []
+        guest_favs = ""
+        for i in self.party.party_kids:
+            if i.is_host:
+                for j in i.favourite_characteristics:
+                    host_favs += f"{j}  "
+            else:
+                for j in i.favourite_characteristics:
+                    if not j in guest_favs:
+                        guest_favs_list.append(j)
+        for i in guest_favs_list:
+            guest_favs += f"{i}  "
+
+        host_fav_characteristics = BasicText(sysfont_10, (x, y), f"Henry likes dinos that are: {host_favs}")
+        y += 20
+        guest_fav_characteristics = BasicText(sysfont_10, (x, y), f"The guests like dinos that are: {guest_favs}")
         
         name.draw(surface)
         econ_stat.draw(surface)
         kid_count.draw(surface)
         minimum_pay.draw(surface)
+        host_fav_characteristics.draw(surface)
+        guest_fav_characteristics.draw(surface)
 
 #
 # party_size = random.randint(3,8)
