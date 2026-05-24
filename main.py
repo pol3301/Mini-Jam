@@ -442,6 +442,11 @@ mouse_just_pressed = False
 mouse_down = False
 
 
+# pygame.event.post(
+#     pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_results")
+# )
+# Results phase test code
+
 while running:
     mouse_pos = adjust_pos_to_display(pygame.mouse.get_pos())
     mouse_just_pressed = False
@@ -487,6 +492,9 @@ while running:
 
                 results = party.Results([test_party1, test_party2, test_party3])
                 objects.append(results)
+
+            elif event.new_state == "party_animation":
+                objects.append(party.Party(8))
 
     if game_state == "title_screen":
         pygame.event.post(
