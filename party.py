@@ -8,6 +8,8 @@ import constants
 
 # SCREEN_SIZE = (1280, 720)
 
+box_blue = pygame.Color(31, 221, 255)
+
 
 class BasicText:
     def __init__(self, font: pygame.freetype.Font, pos, text, color="black"):
@@ -205,6 +207,21 @@ class PartyBox:
         guest_fav_characteristics.draw(surface)
 
 
+class Star:
+    def __init__(self):
+        self.image = pygame.transform.scale(
+            pygame.image.load("assets/star.png").convert_alpha(), (100, 100)
+        )
+
+    def draw(
+        self,
+        surface: pygame.Surface,
+        x,
+        y,
+    ):
+        surface.blit(self.image, self.image.get_rect(topleft=(x, y)))
+
+
 class Results:
     def __init__(self, parties: list[Party]):
         self.parties = parties
@@ -212,10 +229,15 @@ class Results:
     def draw(self, surface: pygame.surface.Surface):
 
         for i, party in enumerate(self.parties):
+            y = 20 + 210 * i
+            rect = pygame.Rect(50, y, 1180, 200)
+            pygame.draw.rect(surface, box_blue, rect)
+
             self.draw_mugshots(surface, i, party)
             self.draw_stats(surface, i, party)
+            self.draw_populartiy(surface, 5, i)
 
-    def draw_mugshots(self, surface: pygame.surface.Surface, i, party: Party):
+    def draw_mugshots(self, surface: pygame.Surface, i, party: Party):
         x, y = 70, 30 + 210 * i
         for kid in party.party_kids:
             if kid.is_host:
@@ -223,7 +245,7 @@ class Results:
                 return
         pass
 
-    def draw_stats(self, surface: pygame.surface.Surface, i, party: Party):
+    def draw_stats(self, surface: pygame.Surface, i, party: Party):
         font_10 = pygame.freetype.SysFont("arial", 10)
         font_20 = pygame.freetype.SysFont("arial", 20)
 
@@ -244,6 +266,14 @@ class Results:
         base_pay_text.draw(surface)
         total_pay_text.draw(surface)
         tip_pay_text.draw(surface)
+
+        # TODO:
+
+    def draw_populartiy(self, surface: pygame.Surface, popularity_rating: int, i):
+        y = 80 + 210 * i
+        for star in range(popularity_rating):
+            x = 600 + 120 * star
+            Star().draw(surface, x, y)
 
 
 #

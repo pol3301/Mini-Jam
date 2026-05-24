@@ -37,6 +37,7 @@ I will only take these words back if you:
 Implement the results phase.
 
 For every party, go one-by-one showing their backdrop, the dinos the player assigned, and how much the party liked it
+
 Then give the flat fee for the party, and the tip
 Then, show the next party's rundown 
 Finally, change the player's reputation depending on how well they did on tips (same system basically)
