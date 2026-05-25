@@ -28,30 +28,18 @@ class BasicSprite:
         surface.blit(self.image, self.rect)
 
 
-class DinoCharacter:
-    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
-        self.name = name
-        self.image = pygame.transform.scale(
-            pygame.image.load(image).convert_alpha(), (size, size)
-        )
-        self.tier = tier
-        self.traits = traits
-        self.recruit_cost = recruit_cost
-        self.inital_duration = duration
-        self.days_remaining = duration
+#class DinoCharacter:
+#    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
+#        self.name = name
+#        self.image = pygame.transform.scale(
+#            pygame.image.load(image).convert_alpha(), (size, size)
+#        )
+#        self.tier = tier
+#        self.traits = traits
+#        self.recruit_cost = recruit_cost
+#        self.inital_duration = duration
+#        self.days_remaining = duration
 
-
-class DinoCharacter:
-    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
-        self.name = name
-        self.image = pygame.transform.scale(
-            pygame.image.load(image).convert_alpha(), (size, size)
-        )
-        self.tier = tier
-        self.traits = traits
-        self.recruit_cost = recruit_cost
-        self.inital_duration = duration
-        self.days_remaining = duration
 
 
 class BasicText:
@@ -136,7 +124,7 @@ class Party:
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
         # self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
-        self.party_dinos: list[DinoCharacter] = [None, None, None]
+        self.party_dinos = [None, None, None]
         self.base_pay = base_pay
         self.host_name = host_name
 
@@ -212,7 +200,6 @@ class Party:
             self.audience_image, self.audience_image.get_rect(topleft=(90, 420))
         )
 
-
 class PartyContractsList:
     def __init__(self, parties, pos, is_owned=False):
         self.party_box_list = []
@@ -225,8 +212,6 @@ class PartyContractsList:
         for i in range(len(parties)):
             self.party_box_list.append(PartyBox(parties[i], i, box_size, is_owned))
 
-            self.party_box_list.append(PartyBox(parties[i], i, box_size))
-
     def scroll(self, d_index):
         num_boxes = len(self.party_box_list)
         for i in self.party_box_list:
@@ -237,8 +222,6 @@ class PartyContractsList:
                 i.index = num_boxes - 1
             if self.is_owned:
                 i.reassign_dino_pos()
-
-            i.reassign_dino_pos()
 
     def set_party_dinos(self):
         for i in self.party_box_list:

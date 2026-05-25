@@ -555,7 +555,6 @@ while running:
             elif event.new_state == "phase_admin":
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
-                party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
                 party_contracts_list = party.PartyContractsList(
                     party_contracts, (640, 10), True
                 )
@@ -576,7 +575,7 @@ while running:
                     loops=1,
                 )
                 objects.append(random.choice(party_contracts))
-                objects.append(party.Party(100, 0, 3))
+                #objects.append(party.Party(100, 0, 3))
 
             elif event.new_state == "phase_contracts":
                 party_pay = random.randint(20, 50 + int(reputation / 2))
@@ -674,13 +673,8 @@ while running:
 
         if mouse_just_pressed:
             for i in party_contracts_list.party_box_list:
-                if (
-                    pygame.Rect(i.get_rect(640, 10)).collidepoint(mouse_pos)
-                    and selected_dino != None
-                ):
-                    i.assign_dino(
-                        dino_list, selected_dino, selected_dino.dino_character
-                    )
+                if pygame.Rect(i.get_rect(640, 10)).collidepoint(mouse_pos) and selected_dino != None:
+                    i.assign_dino(dino_list, selected_dino, selected_dino.dino_character)
                     break
 
             for i in dino_list.dino_list:
