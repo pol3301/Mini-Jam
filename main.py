@@ -260,9 +260,9 @@ class DinoInfoBlock:
         x, y = self.rect.topleft
         self.dino_image = pygame.transform.scale(dino_character.image, (100, 100))
         self.dino_character = dino_character
-        self.name_text = BasicText(mont_15, (120 + x, y+10), str(dino_character.name))
-        self.tier_text = BasicText(mont_15, (120 + x, y+30), str(dino_character.tier))
-        self.days_text = BasicText(mont_15, (120 + x, y+50), str(dino_character.days_remaining))
+        self.name_text = BasicText(mont_15, (120 + x, y+10), f"{dino_character.name}")
+        self.tier_text = BasicText(mont_15, (120 + x, y+30), f"{dino_character.tier} Dino")
+        self.days_text = BasicText(mont_15, (120 + x, y+50), f"{dino_character.days_remaining} days remaining")
 
         traits_text = ""
         traits_overflow = ""
@@ -275,19 +275,25 @@ class DinoInfoBlock:
         self.traits_text = BasicText(mont_bold_10, (120 + x, y+70), str(traits_text))
         self.traits_overflow_text = BasicText(mont_bold_10, (120 + x, y+90), str(traits_overflow))
         self.selected = False
+        self.assignment = None
 
     def tick(self):
         pass
 
     def draw(self, surface: pygame.Surface):
         x, y = self.rect.topleft
-        pygame.draw.rect(surface, "white", self.rect)
+        color = "white"
+        if self.selected:
+            color = "grey"
+        pygame.draw.rect(surface, color, self.rect)
         surface.blit(self.dino_image, (x + 10, y + 10))
         self.name_text.draw(surface)
         self.tier_text.draw(surface)
         self.traits_text.draw(surface)
         self.traits_overflow_text.draw(surface)
         self.days_text.draw(surface)
+        if self.assignment != None:
+            pygame.draw.line(surface, "black", (self.rect.right-20, self.rect.centery), self.assignment[2], 3)
 
 
 class DinoList:
@@ -342,6 +348,7 @@ shop_floor = BasicSprite("assets/stone_floor.png", (1280, 720), (0, 0), False)
 dino_list = DinoList([])
 gray_backdrop = BasicSprite("assets/backdrop.png", (1280, 720), (0, 0), False)
 party_contracts_list = None
+selected_dino = None
 
 def generate_dinos(amount, day, reputation):
     cutouts = 0
@@ -459,9 +466,9 @@ mouse_just_pressed = False
 mouse_down = False
 key_just_pressed = False
 
-# pygame.event.post(
-#     pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_results")
-# )
+#pygame.event.post(
+#    pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_results")
+#)
 # Results phase test code
 
 while running:
@@ -501,10 +508,10 @@ while running:
             elif event.new_state == "phase_admin":
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
-                objects.append(dino_list)
                 party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
                 party_contracts_list = party.PartyContractsList(party_contracts, (640, 10), True)
                 objects.append(party_contracts_list)
+                objects.append(dino_list)
 
             elif event.new_state == "phase_results":
                 test_party1 = party.Party(100, 0, 3)
@@ -566,11 +573,19 @@ while running:
             dino_list.dino_list.insert(0, dino_list.dino_list.pop(-1))
             dino_list.reorder_blocks()
         if mouse_just_pressed:
+            for i in party_contracts_list.party_box_list:
+                if pygame.Rect(i.get_rect(640, 10)).collidepoint(mouse_pos) and selected_dino != None:
+                    print("test")
+                    i.assign_dino(dino_list, selected_dino, selected_dino.dino_character)
+                    break
+
             for i in dino_list.dino_list:
                 i.selected = False
+                selected_dino = None
             for i in dino_list.dino_list:
                 if i.rect.collidepoint(mouse_pos):
                     i.selected = True
+                    selected_dino = i
                     break
 
     elif game_state == "phase_results":

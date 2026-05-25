@@ -59,7 +59,8 @@ class Party:
         self.party_kids = [Kid(1, True)]
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
-        self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
+        #self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
+        self.party_dinos: list[Dino] = [None, None, None]
         self.base_pay = 0
         self.host_name = "Henry"
 
@@ -144,12 +145,58 @@ class PartyBox:
         pygame.draw.rect(surface, pygame.Color(31, 221, 255), ((x, y), self.size))
         self.draw_mugshot(surface, x + 30, starting_y + 10)
         self.draw_stats(surface, x + 230, starting_y + 10)
+        self.draw_dinos(surface, x + 500, y + 10)
+    
+    def get_rect(self, list_x, list_y):
+        y = list_y + 210 * self.index
+        print((list_x, y), self.size)
+        return ((list_x, y), self.size)
 
     def draw_mugshot(self, surface, x, starting_y):
         x, y = x, starting_y + 210 * self.index
         for kid in self.party.party_kids:
             if kid.is_host:
                 kid.draw(surface, x, y)
+    
+    def assign_dino(self, dino_block_list, dino_info_block, dino_character):
+        assignment = dino_info_block.assignment
+        if assignment != None:
+            dino_info_block.assignment[0].party.party_dinos[assignment[1]] = None
+
+        index = -1
+        if self.party.party_dinos[0] == None:
+            self.party.party_dinos[0] = dino_character
+            index = 0
+        elif self.party.party_dinos[1] == None:
+            self.party.party_dinos[1] = dino_character
+            index = 1
+        elif self.party.party_dinos[2] == None:
+            self.party.party_dinos[2] = dino_character
+            index = 2
+        else:
+            self.party.party_dinos = [None, None, None]
+            dino_info_block.assignment = None
+            for i in dino_block_list.dino_list:
+                if i.assignment != None:
+                    if i.assignment[0] == self:
+                        print("self detected")
+                        i.assignment = None
+            return
+        
+        topleft = self.get_rect(640, 10)[0]
+        
+        pos = (topleft[0] + 560 + 10, topleft[1] + 20 + index*30)
+        dino_info_block.assignment = (self, index, pos)
+        print((self, index, pos))
+    
+    def draw_dinos(self, surface, starting_x, starting_y):
+        sysfont_20 = pygame.freetype.SysFont("arial", 20)
+        sysfont_20.render_to(surface, (starting_x, starting_y), "Dino 1: ")
+        sysfont_20.render_to(surface, (starting_x, starting_y + 30), "Dino 2: ")
+        sysfont_20.render_to(surface, (starting_x, starting_y + 60), "Dino 3: ")
+        pygame.draw.rect(surface, "grey", ((starting_x + 60, starting_y), (20, 20)))
+        pygame.draw.rect(surface, "grey", ((starting_x + 60, starting_y + 30), (20, 20)))
+        pygame.draw.rect(surface, "grey", ((starting_x + 60, starting_y + 60), (20, 20)))
 
     def draw_stats(self, surface, x, starting_y):
         sysfont_10 = pygame.freetype.SysFont("arial", 10)
