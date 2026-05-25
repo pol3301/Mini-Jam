@@ -43,7 +43,7 @@ mont_bold_10 = pygame.freetype.Font("assets/Mont-HeavyDEMO.otf", 10)
 
 # current run data
 dinos = []
-money = 1000
+money = 50
 reputation = 100
 current_day = 1
 party_contracts = []
@@ -542,6 +542,8 @@ while running:
             if event.new_state == "phase_shop":
                 objects.append(shop_floor)
                 objects.append(buy_basket)
+                for i in range(len(shop_dinos)):
+                    shop_dinos.pop(0)
                 for i in generate_dinos(random.randint(5, 10), current_day, reputation):
                     shop_dinos.append(
                         ShopDino(i, (random.randint(50, 900), random.randint(100, 620)))
@@ -564,17 +566,48 @@ while running:
 
             elif event.new_state == "phase_results":
                 results = party.Results(party_contracts)
+                for i in party_contracts:
+                    money += int(i.calculate_total())
+                for i in results.parties:
+                    reputation += int(i.calculate_tip()/10)
+                    if int(i.calculate_tip()/10) == 0:
+                        reputation -= 25
+                if reputation < 0:
+                    pygame.event.post(pygame.event.Event(
+                        EVENT_GAME_STATE_CHANGE, new_state="game_over"
+                    ))
                 objects.append(results)
+                party_contracts = []
+                current_day += 1
+                new_dinos = []
+                for i in range(len(dinos)):
+                    dinos[i].days_remaining -= 1
+                    if dinos[i].days_remaining > 0:
+                        new_dinos.append(dinos[i])
+                dinos = new_dinos
+                pygame.time.set_timer(
+                    pygame.event.Event(
+                        EVENT_GAME_STATE_CHANGE, new_state="phase_contracts"
+                    ),
+                    4000,
+                    loops=1,
+                )
 
             elif event.new_state == "party_animation":
-                pygame.time.set_timer(
+                if len(party_contracts) == 0:
+                    reputation -= 100
+                    pygame.event.post(pygame.event.Event(
+                        EVENT_GAME_STATE_CHANGE, new_state="phase_results"
+                    ))
+                else:
+                    pygame.time.set_timer(
                     pygame.event.Event(
                         EVENT_GAME_STATE_CHANGE, new_state="phase_results"
                     ),
                     4000,
                     loops=1,
                 )
-                objects.append(random.choice(party_contracts))
+                    objects.append(random.choice(party_contracts))
                 #objects.append(party.Party(100, 0, 3))
 
             elif event.new_state == "phase_contracts":
@@ -645,7 +678,7 @@ while running:
             )
 
     elif game_state == "phase_contracts":
-        money_count_contract_text.text = f"Money: {money}  -  Reputation: {reputation}"
+        money_count_contract_text.text = f"Money: {money}  -  Reputation: {reputation}  -  Day: {current_day}"
         if mouse_just_pressed:
             for i in new_contracts_list.party_box_list:
                 if i.accept_button.rect.collidepoint(mouse_pos):
@@ -696,9 +729,9 @@ while running:
 
     elif game_state == "phase_results":
         pass
+    elif game_state == "game_over":
+        objects = [BasicText(mont_bold_30, (500, 360), "GAME OVER", "red")]
 
-    if mouse_just_pressed:
-        print(mouse_pos)
 
     screen.fill("black")
     dscreen.surface.fill("white")
