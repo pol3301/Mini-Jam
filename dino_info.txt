@@ -1,0 +1,24 @@
+Trait Pool
+
+Bipedal, Quadrupedal, Flying, Swimming,
+Carnivore, Herbivore, Piscivore,
+Horned, Armored, Spiked, Crested,
+Strong, Speedster, Heavy, Pack Hunter,
+
+characteristics = [
+  "Bipedal", "Quadrupedal", "Flying", "Swimming", "Carnivore", "Herbivore", "Piscivore",
+  "Horned", "Armored", "Spiked", "Crested", "Strong", "Speedster", "Heavy", "Pack Hunter"
+]
+
+Dinosaurs
+
+T-Rex: Carnivore, Bipedal, Strong
+Veolciraptor: Carnivore, bipedal, pack hunter, speedster
+Triceratops: Herbivore, Quadrupedal, Horned, Heavy
+Stegosaurus: Herbivore, Quadrupedal, Spiked, Heavy
+Brachiosaurus: Herbivore, Quadrupedal, Strong
+Ankylosaurus: Herbivore, Quadrupedal, Strong
+Spinosaurus: Carnivore, Bipedal, Swimming, Strong
+Pteranodon: Piscivore, Flying, Speedster
+Parasaurolophus: Herbivore, Bipedal, Crested, Speedster
+Pachycephalosaurus: Herbivore, Bipedal, Armored
