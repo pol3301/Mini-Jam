@@ -10,6 +10,21 @@ import constants
 
 box_blue = pygame.Color(31, 221, 255)
 
+class BasicSprite:
+    def __init__(self, image, size, pos, is_centered=True):
+        self.image = pygame.transform.scale(
+            pygame.image.load(image).convert_alpha(), size
+        )
+        if is_centered:
+            self.rect = self.image.get_rect(center=pos)
+        else:
+            self.rect = self.image.get_rect(topleft=pos)
+
+    def tick(self):
+        pass
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
 
 class BasicText:
     def __init__(self, font: pygame.freetype.Font, pos, text, color="black"):
@@ -53,15 +68,31 @@ class Party:
     audience_path = "assets/audience.png"
 
     def __init__(self, base_pay, budget: int, kid_count):
+        is_boy = random.choice([True, False])
+        if is_boy:
+            host_name = random.choice(constants.kids_boys)
+        else:
+            host_name = random.choice(constants.kids_girls)
+
         self.budget = budget
 
         self.party_kids = [Kid(1, True)]
+
+        if is_boy:
+            self.party_kids[0].audience_image = pygame.transform.scale(
+            pygame.image.load("assets/kid1.png").convert_alpha(), (180, 180)
+        )
+        else:
+            self.party_kids[0].audience_image = pygame.transform.scale(
+            pygame.image.load("assets/kid2.png").convert_alpha(), (180, 180)
+        )
+            
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
         #self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
         self.party_dinos: list[Dino] = [None, None, None]
         self.base_pay = base_pay
-        self.host_name = "Henry"
+        self.host_name = host_name
 
         self.stage_image = pygame.transform.scale(
             pygame.image.load(self.stage_path).convert_alpha(), constants.SCREEN_SIZE
@@ -135,7 +166,7 @@ class PartyContractsList:
         else:
             box_size = (1180, 200)
         for i in range(len(parties)):
-            self.party_box_list.append(PartyBox(parties[i], i, box_size))
+            self.party_box_list.append(PartyBox(parties[i], i, box_size, is_owned))
     
     def scroll(self, d_index):
         num_boxes = len(self.party_box_list)
@@ -145,11 +176,18 @@ class PartyContractsList:
                 i.index = 0
             elif i.index == -1:
                 i.index = num_boxes - 1
-            i.reassign_dino_pos()
+            if self.is_owned:
+                i.reassign_dino_pos()
     
     def set_party_dinos(self):
         for i in self.party_box_list:
             i.set_party_dinos()
+    
+    def remove_index(self, index):
+        self.party_box_list.pop(index)
+        for i in self.party_box_list:
+            if i.index > index:
+                i.index -= 1
 
     def tick(self):
         pass
@@ -161,11 +199,14 @@ class PartyContractsList:
 
 
 class PartyBox:
-    def __init__(self, party: Party, index, size):
+    def __init__(self, party: Party, index, size, is_owned=False):
         self.party = party
         self.index = index
         self.size = size
         self.dino_blocks = [None, None, None]
+        self.is_owned = is_owned
+        self.accept_button = BasicSprite("assets/accept_button.png", (50, 50), (0, 0))
+        self.reject_button = BasicSprite("assets/reject_button.png", (50, 50), (0, 0))
 
     def draw(self, surface, x, starting_y):
         y = starting_y + 210 * self.index
@@ -174,11 +215,20 @@ class PartyBox:
         pygame.draw.rect(surface, pygame.Color(31, 221, 255), ((x, y), self.size))
         self.draw_mugshot(surface, x + 30, starting_y + 10)
         self.draw_stats(surface, x + 230, starting_y + 10)
-        self.draw_dinos(surface, x + 500, y + 10)
+        if self.is_owned:
+            self.draw_dinos(surface, x + 500, y + 10)
+        else:
+            self.draw_decision(surface, x + 640, y + 10)
     
     def get_rect(self, list_x, list_y):
         y = list_y + 210 * self.index
         return ((list_x, y), self.size)
+
+    def draw_decision(self, surface, x, y):
+        self.accept_button.rect.topleft = (x, y)
+        self.reject_button.rect.topleft = (x, y + 50)
+        self.accept_button.draw(surface)
+        self.reject_button.draw(surface)
 
     def draw_mugshot(self, surface, x, starting_y):
         x, y = x, starting_y + 210 * self.index
@@ -243,17 +293,18 @@ class PartyBox:
         sysfont_20 = pygame.freetype.SysFont("arial", 20)
 
         y = starting_y + 210 * self.index
-        name = BasicText(sysfont_20, (x, y), "Henry's party")
+        name = BasicText(sysfont_20, (x, y), f"{self.party.host_name}'s party")
         y += 30
         budget = ""
         if self.party.budget == 0:
             budget = "Low"
         elif self.party.budget == 1:
-            budget == "Average"
+            budget = "Average"
         elif self.party.budget == 2:
-            budget == "High"
+            budget = "High"
         elif self.party.budget >= 3:
-            budget == "Endless"
+            budget = "Endless"
+
         econ_stat = BasicText(sysfont_10, (x, y), f"Budget: {budget}")
         y += 20
         kid_count = BasicText(

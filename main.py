@@ -360,6 +360,7 @@ end_admin_button = BasicSprite("assets/end_admin_button.png", (150, 120), (640, 
 # contracts phase things
 new_contracts_list = None
 new_parties = []
+money_count_contract_text = BasicText(mont_bold_30, (10, 10), "0", "grey")
 
 def generate_dinos(amount, day, reputation):
     cutouts = 0
@@ -537,21 +538,24 @@ while running:
                 objects.append(party.Party(100, 0, 3))
             
             elif event.new_state == "phase_contracts":
-                party_pay = random.randint(20, 50 + int(reputation/2))
                 new_parties = []
-                budget_status = 0
-                if party_pay >= 250:
-                    budget_status = 3
-                elif party_pay >= 150:
-                    budget_status = 2
-                elif party_pay >= 50:
-                    budget_status = 1
-                else:
-                    budget_status = 0
                 for i in range(random.randint(1, max(random.randint(1, 2) + int(reputation/50), 2))):
-                    new_parties.append(party.Party(party_pay, budget_status, (budget_status+1)*random.randint(1, 3)+random.randint(0, 1)))
+                    party_pay = random.randint(20, 50 + int(reputation/2))
+                    budget_status = 0
+                    if party_pay >= 250:
+                        budget_status = 3
+                    elif party_pay >= 150:
+                        budget_status = 2
+                    elif party_pay >= 50:
+                        budget_status = 1
+                    else:
+                        budget_status = 0
+                    num_guests = ((budget_status+1)*random.randint(1, 3))+random.randint(0, 1)
+                    new_parties.append(party.Party(party_pay, budget_status, num_guests))
+                    
                 new_contracts_list = party.PartyContractsList(new_parties, (10, 10))
                 objects.append(new_contracts_list)
+                objects.append(money_count_contract_text)
 
     keys = pygame.key.get_pressed()
 
@@ -592,9 +596,21 @@ while running:
             )
 
     elif game_state == "phase_contracts":
-        pass
+        money_count_contract_text.text = f"Money: {money}"
+        if mouse_just_pressed:
+            for i in new_contracts_list.party_box_list:
+                if i.accept_button.rect.collidepoint(mouse_pos):
+                    party_contracts.append(i.party)
+                    new_contracts_list.remove_index(i.index)
+                elif i.reject_button.rect.collidepoint(mouse_pos):
+                    new_contracts_list.remove_index(i.index)
+        if len(new_contracts_list.party_box_list) == 0:
+            pygame.event.post(
+                pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_shop")
+            )
 
     elif game_state == "phase_admin":
+        money_count_text.text = f"Money: {str(money)}"
         if keys[pygame.K_UP] and key_just_pressed:
             dino_list.dino_list.append(dino_list.dino_list.pop(0))
             dino_list.reorder_blocks()
