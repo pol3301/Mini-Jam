@@ -10,6 +10,7 @@ import constants
 
 box_blue = pygame.Color(31, 221, 255)
 
+
 class BasicSprite:
     def __init__(self, image, size, pos, is_centered=True):
         self.image = pygame.transform.scale(
@@ -25,6 +26,33 @@ class BasicSprite:
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
+
+
+class DinoCharacter:
+    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
+        self.name = name
+        self.image = pygame.transform.scale(
+            pygame.image.load(image).convert_alpha(), (size, size)
+        )
+        self.tier = tier
+        self.traits = traits
+        self.recruit_cost = recruit_cost
+        self.inital_duration = duration
+        self.days_remaining = duration
+
+
+class DinoCharacter:
+    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
+        self.name = name
+        self.image = pygame.transform.scale(
+            pygame.image.load(image).convert_alpha(), (size, size)
+        )
+        self.tier = tier
+        self.traits = traits
+        self.recruit_cost = recruit_cost
+        self.inital_duration = duration
+        self.days_remaining = duration
+
 
 class BasicText:
     def __init__(self, font: pygame.freetype.Font, pos, text, color="black"):
@@ -98,17 +126,17 @@ class Party:
 
         if is_boy:
             self.party_kids[0].audience_image = pygame.transform.scale(
-            pygame.image.load("assets/kid1.png").convert_alpha(), (180, 180)
-        )
+                pygame.image.load("assets/kid1.png").convert_alpha(), (180, 180)
+            )
         else:
             self.party_kids[0].audience_image = pygame.transform.scale(
-            pygame.image.load("assets/kid2.png").convert_alpha(), (180, 180)
-        )
-            
+                pygame.image.load("assets/kid2.png").convert_alpha(), (180, 180)
+            )
+
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
-        #self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
-        self.party_dinos: list[Dino] = [None, None, None]
+        # self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
+        self.party_dinos: list[DinoCharacter] = [None, None, None]
         self.base_pay = base_pay
         self.host_name = host_name
 
@@ -163,7 +191,18 @@ class Party:
 
     def draw(self, surface):
         self.draw_stage(surface)
+        self.draw_dinos(surface)
         self.draw_audience(surface)
+
+    def draw_dinos(self, surface):
+        x = 270
+        for dino in self.party_dinos:
+            x += 170
+            surface.blit(dino.image, dino.image.get_rect(topleft=(x, 320)))
+
+    # (270, 322)
+    # (461, 325)
+    # (612, 317)
 
     def draw_stage(self, surface):
         surface.blit(self.stage_image, self.stage_image.get_rect(topleft=(0, 0)))
@@ -185,7 +224,9 @@ class PartyContractsList:
             box_size = (1180, 200)
         for i in range(len(parties)):
             self.party_box_list.append(PartyBox(parties[i], i, box_size, is_owned))
-    
+
+            self.party_box_list.append(PartyBox(parties[i], i, box_size))
+
     def scroll(self, d_index):
         num_boxes = len(self.party_box_list)
         for i in self.party_box_list:
@@ -196,11 +237,13 @@ class PartyContractsList:
                 i.index = num_boxes - 1
             if self.is_owned:
                 i.reassign_dino_pos()
-    
+
+            i.reassign_dino_pos()
+
     def set_party_dinos(self):
         for i in self.party_box_list:
             i.set_party_dinos()
-    
+
     def remove_index(self, index):
         self.party_box_list.pop(index)
         for i in self.party_box_list:
@@ -213,7 +256,6 @@ class PartyContractsList:
     def draw(self, surface: pygame.Surface):
         for i in self.party_box_list:
             i.draw(surface, self.pos[0], self.pos[1])
-
 
 
 class PartyBox:
@@ -237,7 +279,7 @@ class PartyBox:
             self.draw_dinos(surface, x + 500, y + 10)
         else:
             self.draw_decision(surface, x + 640, y + 10)
-    
+
     def get_rect(self, list_x, list_y):
         y = list_y + 210 * self.index
         return ((list_x, y), self.size)
@@ -253,7 +295,7 @@ class PartyBox:
         for kid in self.party.party_kids:
             if kid.is_host:
                 kid.draw(surface, x, y)
-    
+
     def assign_dino(self, dino_block_list, dino_info_block, dino_character):
         assignment = dino_info_block.assignment
         if assignment != None:
@@ -277,34 +319,38 @@ class PartyBox:
                     if i.assignment[0] == self:
                         i.assignment = None
             return
-        
+
         topleft = self.get_rect(640, 10)[0]
         self.dino_blocks[index] = dino_info_block
-        
-        pos = (topleft[0] + 560 + 10, topleft[1] + 20 + index*30)
+
+        pos = (topleft[0] + 560 + 10, topleft[1] + 20 + index * 30)
         dino_info_block.assignment = (self, index, pos)
-    
+
     def reassign_dino_pos(self):
         topleft = self.get_rect(640, 10)[0]
         for i in range(len(self.party.party_dinos)):
             if self.party.party_dinos[i] != None:
-                pos = (topleft[0] + 560 + 10, topleft[1] + 20 + i*30)
+                pos = (topleft[0] + 560 + 10, topleft[1] + 20 + i * 30)
                 self.dino_blocks[i].assignment = (self, i, pos)
-    
+
     def set_party_dinos(self):
         self.party.party_dinos = []
         for i in self.dino_blocks:
             if i != None:
                 self.party.party_dinos.append(i.dino_character)
-    
+
     def draw_dinos(self, surface, starting_x, starting_y):
         sysfont_20 = pygame.freetype.SysFont("arial", 20)
         sysfont_20.render_to(surface, (starting_x, starting_y), "Dino 1: ")
         sysfont_20.render_to(surface, (starting_x, starting_y + 30), "Dino 2: ")
         sysfont_20.render_to(surface, (starting_x, starting_y + 60), "Dino 3: ")
         pygame.draw.rect(surface, "grey", ((starting_x + 60, starting_y), (20, 20)))
-        pygame.draw.rect(surface, "grey", ((starting_x + 60, starting_y + 30), (20, 20)))
-        pygame.draw.rect(surface, "grey", ((starting_x + 60, starting_y + 60), (20, 20)))
+        pygame.draw.rect(
+            surface, "grey", ((starting_x + 60, starting_y + 30), (20, 20))
+        )
+        pygame.draw.rect(
+            surface, "grey", ((starting_x + 60, starting_y + 60), (20, 20))
+        )
 
     def draw_stats(self, surface, x, starting_y):
         sysfont_10 = pygame.freetype.SysFont("arial", 10)
@@ -400,76 +446,6 @@ class Results:
             if kid.is_host:
                 kid.draw(surface, x, y)
                 return
-        pass
-
-    def draw_stats(self, surface: pygame.Surface, i, party: Party):
-        font_10 = pygame.freetype.SysFont("arial", 10)
-        font_20 = pygame.freetype.SysFont("arial", 20)
-
-        tip = math.trunc(party.calculate_tip())
-
-        y = 30 + 210 * i
-        name_text = BasicText(font_20, (270, y), f"{party.host_name}'s party")
-        y += 60
-        base_pay_text = BasicText(font_10, (270, y), f"Base pay: {party.base_pay}")
-        y += 20
-        tip_pay_text = BasicText(font_10, (270, y), f"Tip pay: {tip}")
-        y += 20
-        total_pay_text = BasicText(
-            font_10, (270, y), f"Total pay: {tip + party.base_pay}"
-        )
-
-        name_text.draw(surface)
-        base_pay_text.draw(surface)
-        total_pay_text.draw(surface)
-        tip_pay_text.draw(surface)
-
-        # TODO:
-
-    def draw_populartiy(self, surface: pygame.Surface, popularity_rating: int, i):
-        y = 80 + 210 * i
-        for star in range(popularity_rating):
-            x = 600 + 120 * star
-            Star().draw(surface, x, y)
-
-
-
-class Star:
-    def __init__(self):
-        self.image = pygame.transform.scale(
-            pygame.image.load("assets/star.png").convert_alpha(), (100, 100)
-        )
-
-    def draw(
-        self,
-        surface: pygame.Surface,
-        x,
-        y,
-    ):
-        surface.blit(self.image, self.image.get_rect(topleft=(x, y)))
-
-
-class Results:
-    def __init__(self, parties: list[Party]):
-        self.parties = parties
-
-    def draw(self, surface: pygame.surface.Surface):
-
-        for i, party in enumerate(self.parties):
-            y = 20 + 210 * i
-            rect = pygame.Rect(50, y, 1180, 200)
-            pygame.draw.rect(surface, box_blue, rect)
-
-            self.draw_mugshots(surface, i, party)
-            self.draw_stats(surface, i, party)
-            self.draw_populartiy(surface, 5, i)
-
-    def draw_mugshots(self, surface: pygame.Surface, i, party: Party):
-        x, y = 70, 30 + 210 * i
-        for kid in party.party_kids:
-            if kid.is_host:
-                kid.draw(surface, x, y)
-                return
 
     def draw_stats(self, surface: pygame.Surface, i, party: Party):
         font_10 = pygame.freetype.SysFont("arial", 10)
@@ -491,7 +467,6 @@ class Results:
         if party.calculate_total() == 0:
             fail_text = BasicText(font_10, (270, y), "CONTRACT FAILED", "red")
             fail_text.draw(surface)
-
 
         name_text.draw(surface)
         base_pay_text.draw(surface)
