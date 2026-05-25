@@ -552,6 +552,7 @@ while running:
             elif event.new_state == "phase_admin":
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
+                party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
                 party_contracts_list = party.PartyContractsList(
                     party_contracts, (640, 10), True
                 )
@@ -575,6 +576,7 @@ while running:
                 objects.append(party.Party(100, 0, 3))
 
             elif event.new_state == "phase_contracts":
+                party_pay = random.randint(20, 50 + int(reputation / 2))
                 new_parties = []
                 for i in range(
                     random.randint(

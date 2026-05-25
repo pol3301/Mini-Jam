@@ -10,6 +10,7 @@ import constants
 
 box_blue = pygame.Color(31, 221, 255)
 
+
 class BasicSprite:
     def __init__(self, image, size, pos, is_centered=True):
         self.image = pygame.transform.scale(
@@ -25,6 +26,20 @@ class BasicSprite:
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
+
+
+class DinoCharacter:
+    def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
+        self.name = name
+        self.image = pygame.transform.scale(
+            pygame.image.load(image).convert_alpha(), (size, size)
+        )
+        self.tier = tier
+        self.traits = traits
+        self.recruit_cost = recruit_cost
+        self.inital_duration = duration
+        self.days_remaining = duration
+
 
 class DinoCharacter:
     def __init__(self, name, image, size, tier, traits, recruit_cost, duration):
@@ -93,13 +108,13 @@ class Party:
 
         if is_boy:
             self.party_kids[0].audience_image = pygame.transform.scale(
-            pygame.image.load("assets/kid1.png").convert_alpha(), (180, 180)
-        )
+                pygame.image.load("assets/kid1.png").convert_alpha(), (180, 180)
+            )
         else:
             self.party_kids[0].audience_image = pygame.transform.scale(
-            pygame.image.load("assets/kid2.png").convert_alpha(), (180, 180)
-        )
-            
+                pygame.image.load("assets/kid2.png").convert_alpha(), (180, 180)
+            )
+
         for i in range(kid_count - 1):
             self.party_kids.append(Kid(i + 2, False))
         # self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
@@ -190,13 +205,10 @@ class PartyContractsList:
         else:
             box_size = (1180, 200)
         for i in range(len(parties)):
-<<<<<<< HEAD
             self.party_box_list.append(PartyBox(parties[i], i, box_size, is_owned))
-    
-=======
+
             self.party_box_list.append(PartyBox(parties[i], i, box_size))
 
->>>>>>> 13a5651 (Animation done)
     def scroll(self, d_index):
         num_boxes = len(self.party_box_list)
         for i in self.party_box_list:
@@ -205,18 +217,15 @@ class PartyContractsList:
                 i.index = 0
             elif i.index == -1:
                 i.index = num_boxes - 1
-<<<<<<< HEAD
             if self.is_owned:
                 i.reassign_dino_pos()
-    
-=======
+
             i.reassign_dino_pos()
 
->>>>>>> 13a5651 (Animation done)
     def set_party_dinos(self):
         for i in self.party_box_list:
             i.set_party_dinos()
-    
+
     def remove_index(self, index):
         self.party_box_list.pop(index)
         for i in self.party_box_list:
@@ -248,16 +257,11 @@ class PartyBox:
         pygame.draw.rect(surface, pygame.Color(31, 221, 255), ((x, y), self.size))
         self.draw_mugshot(surface, x + 30, starting_y + 10)
         self.draw_stats(surface, x + 230, starting_y + 10)
-<<<<<<< HEAD
         if self.is_owned:
             self.draw_dinos(surface, x + 500, y + 10)
         else:
             self.draw_decision(surface, x + 640, y + 10)
-    
-=======
-        self.draw_dinos(surface, x + 500, y + 10)
 
->>>>>>> 13a5651 (Animation done)
     def get_rect(self, list_x, list_y):
         y = list_y + 210 * self.index
         return ((list_x, y), self.size)
