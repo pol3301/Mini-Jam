@@ -42,9 +42,27 @@ class BasicText:
 
 class Kid:
     def __init__(self, favourite_ranking, is_host):
-        self.favourite_characteristics = random.sample(
-            constants.dinosaur_characteristics, 2
-        )
+        self.favourite_characteristics = []
+        if is_host:
+            self.favourite_characteristics = random.sample(constants.dino_chars, 2)
+        else:
+
+            for i in range(random.randint(1,2)):
+                rand_chance = random.randint(0, 5)
+                if rand_chance >= 3:
+                    choice = random.choice(constants.dino_chars)
+                elif rand_chance >= 1:
+                    choice = random.choice(constants.strong_dino_characteristics)
+                else:
+                    choice = random.choice(constants.weak_dino_characteristics)
+                if not choice in self.favourite_characteristics:
+                    self.favourite_characteristics.append(choice)
+                else:
+                    while True:
+                        choice = random.choice(constants.dino_chars)
+                        if not choice in self.favourite_characteristics:
+                            self.favourite_characteristics.append(choice)
+                            break
 
         self.favourite_ranking = favourite_ranking
         self.is_host = is_host

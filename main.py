@@ -370,8 +370,8 @@ def generate_dinos(amount, day, reputation):
     quality = 0
     generated_dinos = []
 
-    strong_traits = constants.dinosaur_characteristics
-    weak_traits = constants.dinosaur_characteristics
+    strong_traits = constants.strong_dino_characteristics
+    weak_traits = constants.weak_dino_characteristics
 
     for i in range(amount):
         for i in range(day * int(reputation / 50)):
@@ -386,13 +386,14 @@ def generate_dinos(amount, day, reputation):
             reals += 1
 
     for i in range(cutouts):
-        name = "Placeholder"
-        image = "assets/dino_placeholder1.png"
+        random_choice = random.choice(list(constants.dino_archetypes.keys()))
+        name = f"Cutout of {random_choice}"
+        image = constants.dino_images[random_choice]
         size = 150
         cost = random.randint(1, 3) * 5
         duration = random.randint(4, 8)
-        traits = []
-        for i in range(random.randint(3, 5)):
+        traits = random.sample(constants.dino_archetypes[random_choice], 1)
+        for i in range(random.randint(2, 4)):
             if random.randint(1, 5) == 5:
                 traits.append(random.choice(strong_traits))
                 luck = random.randint(0, 3)
@@ -414,13 +415,14 @@ def generate_dinos(amount, day, reputation):
         )
 
     for i in range(costumes):
-        name = "Placeholder"
-        image = "assets/dino_placeholder1.png"
+        random_choice = random.choice(list(constants.dino_archetypes.keys()))
+        name = f"{random_choice} Costume"
+        image = constants.dino_images[random_choice]
         size = 175
         cost = random.randint(3, 6) * 10
         duration = random.randint(4, 6)
-        traits = []
-        for i in range(random.randint(3, 5)):
+        traits = random.sample(constants.dino_archetypes[random_choice], 2)
+        for i in range(random.randint(2, 4)):
             if random.randint(1, 3) == 3:
                 traits.append(random.choice(strong_traits))
                 luck = random.randint(0, 2)
@@ -442,13 +444,14 @@ def generate_dinos(amount, day, reputation):
         )
 
     for i in range(reals):
-        name = "Placeholder"
-        image = "assets/dino_placeholder1.png"
+        random_choice = random.choice(list(constants.dino_archetypes.keys()))
+        name = f"{random_choice}"
+        image = constants.dino_images[random_choice]
         size = 200
         cost = random.randint(7, 15) * 10
         duration = random.randint(1, 3)
-        traits = []
-        for i in range(random.randint(4, 6)):
+        traits = random.sample(constants.dino_archetypes[random_choice], 3)
+        for i in range(random.randint(2, 3)):
             if random.randint(1, 5) >= 3:
                 traits.append(random.choice(strong_traits))
                 luck = random.randint(0, 5)
