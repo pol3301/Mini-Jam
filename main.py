@@ -260,9 +260,15 @@ class DinoInfoBlock:
         x, y = self.rect.topleft
         self.dino_image = pygame.transform.scale(dino_character.image, (100, 100))
         self.dino_character = dino_character
-        self.name_text = BasicText(mont_15, (120 + x, y+10), f"{dino_character.name}")
-        self.tier_text = BasicText(mont_15, (120 + x, y+30), f"{dino_character.tier} Dino")
-        self.days_text = BasicText(mont_15, (120 + x, y+50), f"{dino_character.days_remaining} days remaining")
+        self.name_text = BasicText(mont_15, (120 + x, y + 10), f"{dino_character.name}")
+        self.tier_text = BasicText(
+            mont_15, (120 + x, y + 30), f"{dino_character.tier} Dino"
+        )
+        self.days_text = BasicText(
+            mont_15,
+            (120 + x, y + 50),
+            f"{dino_character.days_remaining} days remaining",
+        )
 
         traits_text = ""
         traits_overflow = ""
@@ -272,8 +278,10 @@ class DinoInfoBlock:
                 traits_text += new_text
             else:
                 traits_overflow += new_text
-        self.traits_text = BasicText(mont_bold_10, (120 + x, y+70), str(traits_text))
-        self.traits_overflow_text = BasicText(mont_bold_10, (120 + x, y+90), str(traits_overflow))
+        self.traits_text = BasicText(mont_bold_10, (120 + x, y + 70), str(traits_text))
+        self.traits_overflow_text = BasicText(
+            mont_bold_10, (120 + x, y + 90), str(traits_overflow)
+        )
         self.selected = False
         self.assignment = None
 
@@ -293,7 +301,13 @@ class DinoInfoBlock:
         self.traits_overflow_text.draw(surface)
         self.days_text.draw(surface)
         if self.assignment != None:
-            pygame.draw.line(surface, "black", (self.rect.right-20, self.rect.centery), self.assignment[2], 3)
+            pygame.draw.line(
+                surface,
+                "black",
+                (self.rect.right - 20, self.rect.centery),
+                self.assignment[2],
+                3,
+            )
 
 
 class DinoList:
@@ -301,10 +315,16 @@ class DinoList:
         self.dino_list = []
         for i in range(len(dino_character_list)):
             if i % 2 == 0:
-                self.dino_list.append(DinoInfoBlock((10, 10+(i/2)*130), dino_character_list[i]))
+                self.dino_list.append(
+                    DinoInfoBlock((10, 10 + (i / 2) * 130), dino_character_list[i])
+                )
             else:
-                self.dino_list.append(DinoInfoBlock((325, 10+math.floor(i/2)*130), dino_character_list[i]))
-    
+                self.dino_list.append(
+                    DinoInfoBlock(
+                        (325, 10 + math.floor(i / 2) * 130), dino_character_list[i]
+                    )
+                )
+
     def reorder_blocks(self):
         dino_character_list = []
         assignment_list = []
@@ -314,14 +334,22 @@ class DinoList:
         self.dino_list = []
         for i in range(len(dino_character_list)):
             if i % 2 == 0:
-                self.dino_list.append(DinoInfoBlock((10, 10+(i/2)*130), dino_character_list[i]))
+                self.dino_list.append(
+                    DinoInfoBlock((10, 10 + (i / 2) * 130), dino_character_list[i])
+                )
             else:
-                self.dino_list.append(DinoInfoBlock((325, 10+math.floor(i/2)*130), dino_character_list[i]))
+                self.dino_list.append(
+                    DinoInfoBlock(
+                        (325, 10 + math.floor(i / 2) * 130), dino_character_list[i]
+                    )
+                )
             replacing_dino_block = dino_list.dino_list[-1]
             replacing_dino_block.assignment = assignment_list[i]
             if replacing_dino_block.assignment != None:
-                replacing_dino_block.assignment[0].dino_blocks[replacing_dino_block.assignment[1]] = replacing_dino_block
-    
+                replacing_dino_block.assignment[0].dino_blocks[
+                    replacing_dino_block.assignment[1]
+                ] = replacing_dino_block
+
     def tick(self):
         pass
 
@@ -361,6 +389,7 @@ end_admin_button = BasicSprite("assets/end_admin_button.png", (150, 120), (640, 
 new_contracts_list = None
 new_parties = []
 money_count_contract_text = BasicText(mont_bold_30, (10, 10), "0", "grey")
+
 
 def generate_dinos(amount, day, reputation):
     cutouts = 0
@@ -481,6 +510,9 @@ key_just_pressed = False
 pygame.event.post(
     pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_contracts")
 )
+# pygame.event.post(
+#    pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_results")
+# )
 # Results phase test code
 
 while running:
@@ -520,26 +552,36 @@ while running:
             elif event.new_state == "phase_admin":
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
-                party_contracts_list = party.PartyContractsList(party_contracts, (640, 10), True)
+                party_contracts_list = party.PartyContractsList(
+                    party_contracts, (640, 10), True
+                )
                 objects.append(party_contracts_list)
                 objects.append(dino_list)
                 objects.append(end_admin_button)
 
             elif event.new_state == "phase_results":
-                #test_party1 = party.Party(100, 0, 3)
-                #test_party2 = party.Party(100, 0, 5)
-                #test_party3 = party.Party(100, 0, 7)
-
                 results = party.Results(party_contracts)
                 objects.append(results)
 
             elif event.new_state == "party_animation":
+                pygame.time.set_timer(
+                    pygame.event.Event(
+                        EVENT_GAME_STATE_CHANGE, new_state="phase_results"
+                    ),
+                    4000,
+                    loops=1,
+                )
+                objects.append(random.choice(party_contracts))
                 objects.append(party.Party(100, 0, 3))
-            
+
             elif event.new_state == "phase_contracts":
                 new_parties = []
-                for i in range(random.randint(1, max(random.randint(1, 2) + int(reputation/50), 2))):
-                    party_pay = random.randint(20, 50 + int(reputation/2))
+                for i in range(
+                    random.randint(
+                        1, max(random.randint(1, 2) + int(reputation / 50), 2)
+                    )
+                ):
+                    party_pay = random.randint(20, 50 + int(reputation / 2))
                     budget_status = 0
                     if party_pay >= 250:
                         budget_status = 3
@@ -549,9 +591,13 @@ while running:
                         budget_status = 1
                     else:
                         budget_status = 0
-                    num_guests = ((budget_status+1)*random.randint(1, 3))+random.randint(0, 1)
-                    new_parties.append(party.Party(party_pay, budget_status, num_guests))
-                    
+                    num_guests = (
+                        (budget_status + 1) * random.randint(1, 3)
+                    ) + random.randint(0, 1)
+                    new_parties.append(
+                        party.Party(party_pay, budget_status, num_guests)
+                    )
+
                 new_contracts_list = party.PartyContractsList(new_parties, (10, 10))
                 objects.append(new_contracts_list)
                 objects.append(money_count_contract_text)
@@ -623,8 +669,13 @@ while running:
 
         if mouse_just_pressed:
             for i in party_contracts_list.party_box_list:
-                if pygame.Rect(i.get_rect(640, 10)).collidepoint(mouse_pos) and selected_dino != None:
-                    i.assign_dino(dino_list, selected_dino, selected_dino.dino_character)
+                if (
+                    pygame.Rect(i.get_rect(640, 10)).collidepoint(mouse_pos)
+                    and selected_dino != None
+                ):
+                    i.assign_dino(
+                        dino_list, selected_dino, selected_dino.dino_character
+                    )
                     break
 
             for i in dino_list.dino_list:
@@ -635,15 +686,20 @@ while running:
                     i.selected = True
                     selected_dino = i
                     break
-            
+
             if end_admin_button.rect.collidepoint(mouse_pos):
                 party_contracts_list.set_party_dinos()
                 pygame.event.post(
-                    pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_results")
+                    pygame.event.Event(
+                        EVENT_GAME_STATE_CHANGE, new_state="party_animation"
+                    )
                 )
 
     elif game_state == "phase_results":
         pass
+
+    if mouse_just_pressed:
+        print(mouse_pos)
 
     screen.fill("black")
     dscreen.surface.fill("white")
