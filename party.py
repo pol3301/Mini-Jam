@@ -107,6 +107,11 @@ class Party:
 
         return party_earn
 
+    def calculate_total(self):
+        if len(self.party_dinos) == 0:
+            return 0
+        return self.base_pay + self.calculate_tip()
+
     def draw(self, surface):
         self.draw_stage(surface)
         self.draw_audience(surface)
@@ -396,7 +401,6 @@ class Results:
             if kid.is_host:
                 kid.draw(surface, x, y)
                 return
-        pass
 
     def draw_stats(self, surface: pygame.Surface, i, party: Party):
         font_10 = pygame.freetype.SysFont("arial", 10)
@@ -412,8 +416,13 @@ class Results:
         tip_pay_text = BasicText(font_10, (270, y), f"Tip pay: {tip}")
         y += 20
         total_pay_text = BasicText(
-            font_10, (270, y), f"Total pay: {tip + party.base_pay}"
+            font_10, (270, y), f"Total pay: {party.calculate_total()}"
         )
+        y += 20
+        if party.calculate_total() == 0:
+            fail_text = BasicText(font_10, (270, y), "CONTRACT FAILED", "red")
+            fail_text.draw(surface)
+
 
         name_text.draw(surface)
         base_pay_text.draw(surface)
