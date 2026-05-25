@@ -52,8 +52,7 @@ class Party:
     stage_path = "assets/stage.png"
     audience_path = "assets/audience.png"
 
-    def __init__(self, price, budget: int, kid_count):
-        self.price = price
+    def __init__(self, base_pay, budget: int, kid_count):
         self.budget = budget
 
         self.party_kids = [Kid(1, True)]
@@ -61,7 +60,7 @@ class Party:
             self.party_kids.append(Kid(i + 2, False))
         #self.party_dinos: list[Dino] = [Dino(), Dino(), Dino()]
         self.party_dinos: list[Dino] = [None, None, None]
-        self.base_pay = 0
+        self.base_pay = base_pay
         self.host_name = "Henry"
 
         self.stage_image = pygame.transform.scale(
@@ -77,13 +76,24 @@ class Party:
 
     def calculate_tip(self):
         party_earn = 0
+        if len(self.party_dinos) == 0:
+            return 0
+
         for kid in self.party_kids:
             personal_earn = 5
 
             for dino in self.party_dinos:
-                dino_earn = dino.base_earn
+                if dino.tier == "Cutout":
+                    dino_earn = 2
+                elif dino.tier == "Costume":
+                    dino_earn = 4
+                elif dino.tier == "Real":
+                    dino_earn = 6
+                else:
+                    print("FUCK")
+                    dino_earn = 0
 
-                for characteristic in dino.characteristics:
+                for characteristic in dino.traits:
                     for kid_fav_char in kid.favourite_characteristics:
                         if characteristic == kid_fav_char:
                             dino_earn *= 2
@@ -112,7 +122,6 @@ class Party:
 
 class PartyContractsList:
     def __init__(self, parties, pos, is_owned=False):
-        print("party contract list")
         self.party_box_list = []
         self.is_owned = is_owned
         self.pos = pos
@@ -122,6 +131,20 @@ class PartyContractsList:
             box_size = (1180, 200)
         for i in range(len(parties)):
             self.party_box_list.append(PartyBox(parties[i], i, box_size))
+    
+    def scroll(self, d_index):
+        num_boxes = len(self.party_box_list)
+        for i in self.party_box_list:
+            i.index += d_index
+            if i.index == num_boxes:
+                i.index = 0
+            elif i.index == -1:
+                i.index = num_boxes - 1
+            i.reassign_dino_pos()
+    
+    def set_party_dinos(self):
+        for i in self.party_box_list:
+            i.set_party_dinos()
 
     def tick(self):
         pass
@@ -137,6 +160,7 @@ class PartyBox:
         self.party = party
         self.index = index
         self.size = size
+        self.dino_blocks = [None, None, None]
 
     def draw(self, surface, x, starting_y):
         y = starting_y + 210 * self.index
@@ -149,7 +173,6 @@ class PartyBox:
     
     def get_rect(self, list_x, list_y):
         y = list_y + 210 * self.index
-        print((list_x, y), self.size)
         return ((list_x, y), self.size)
 
     def draw_mugshot(self, surface, x, starting_y):
@@ -179,15 +202,27 @@ class PartyBox:
             for i in dino_block_list.dino_list:
                 if i.assignment != None:
                     if i.assignment[0] == self:
-                        print("self detected")
                         i.assignment = None
             return
         
         topleft = self.get_rect(640, 10)[0]
+        self.dino_blocks[index] = dino_info_block
         
         pos = (topleft[0] + 560 + 10, topleft[1] + 20 + index*30)
         dino_info_block.assignment = (self, index, pos)
-        print((self, index, pos))
+    
+    def reassign_dino_pos(self):
+        topleft = self.get_rect(640, 10)[0]
+        for i in range(len(self.party.party_dinos)):
+            if self.party.party_dinos[i] != None:
+                pos = (topleft[0] + 560 + 10, topleft[1] + 20 + i*30)
+                self.dino_blocks[i].assignment = (self, i, pos)
+    
+    def set_party_dinos(self):
+        self.party.party_dinos = []
+        for i in self.dino_blocks:
+            if i != None:
+                self.party.party_dinos.append(i.dino_character)
     
     def draw_dinos(self, surface, starting_x, starting_y):
         sysfont_20 = pygame.freetype.SysFont("arial", 20)
@@ -221,7 +256,7 @@ class PartyBox:
         )
         y += 20
         minimum_pay = BasicText(
-            sysfont_10, (x, y), f"Pay (before tip): {self.party.price}"
+            sysfont_10, (x, y), f"Pay (before tip): {self.party.base_pay}"
         )
         y += 20
 

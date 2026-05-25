@@ -307,14 +307,20 @@ class DinoList:
     
     def reorder_blocks(self):
         dino_character_list = []
+        assignment_list = []
         for i in self.dino_list:
             dino_character_list.append(i.dino_character)
+            assignment_list.append(i.assignment)
         self.dino_list = []
         for i in range(len(dino_character_list)):
             if i % 2 == 0:
                 self.dino_list.append(DinoInfoBlock((10, 10+(i/2)*130), dino_character_list[i]))
             else:
                 self.dino_list.append(DinoInfoBlock((325, 10+math.floor(i/2)*130), dino_character_list[i]))
+            replacing_dino_block = dino_list.dino_list[-1]
+            replacing_dino_block.assignment = assignment_list[i]
+            if replacing_dino_block.assignment != None:
+                replacing_dino_block.assignment[0].dino_blocks[replacing_dino_block.assignment[1]] = replacing_dino_block
     
     def tick(self):
         pass
@@ -349,6 +355,7 @@ dino_list = DinoList([])
 gray_backdrop = BasicSprite("assets/backdrop.png", (1280, 720), (0, 0), False)
 party_contracts_list = None
 selected_dino = None
+end_admin_button = BasicSprite("assets/end_admin_button.png", (150, 120), (640, 650))
 
 def generate_dinos(amount, day, reputation):
     cutouts = 0
@@ -512,13 +519,14 @@ while running:
                 party_contracts_list = party.PartyContractsList(party_contracts, (640, 10), True)
                 objects.append(party_contracts_list)
                 objects.append(dino_list)
+                objects.append(end_admin_button)
 
             elif event.new_state == "phase_results":
-                test_party1 = party.Party(100, 0, 3)
-                test_party2 = party.Party(100, 0, 5)
-                test_party3 = party.Party(100, 0, 7)
+                #test_party1 = party.Party(100, 0, 3)
+                #test_party2 = party.Party(100, 0, 5)
+                #test_party3 = party.Party(100, 0, 7)
 
-                results = party.Results([test_party1, test_party2, test_party3])
+                results = party.Results(party_contracts)
                 objects.append(results)
 
             elif event.new_state == "party_animation":
@@ -572,10 +580,14 @@ while running:
         elif keys[pygame.K_DOWN] and key_just_pressed:
             dino_list.dino_list.insert(0, dino_list.dino_list.pop(-1))
             dino_list.reorder_blocks()
+        elif keys[pygame.K_RIGHT] and key_just_pressed:
+            party_contracts_list.scroll(1)
+        elif keys[pygame.K_LEFT] and key_just_pressed:
+            party_contracts_list.scroll(-1)
+
         if mouse_just_pressed:
             for i in party_contracts_list.party_box_list:
                 if pygame.Rect(i.get_rect(640, 10)).collidepoint(mouse_pos) and selected_dino != None:
-                    print("test")
                     i.assign_dino(dino_list, selected_dino, selected_dino.dino_character)
                     break
 
@@ -587,6 +599,12 @@ while running:
                     i.selected = True
                     selected_dino = i
                     break
+            
+            if end_admin_button.rect.collidepoint(mouse_pos):
+                party_contracts_list.set_party_dinos()
+                pygame.event.post(
+                    pygame.event.Event(EVENT_GAME_STATE_CHANGE, new_state="phase_results")
+                )
 
     elif game_state == "phase_results":
         pass
