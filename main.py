@@ -520,7 +520,6 @@ while running:
             elif event.new_state == "phase_admin":
                 dino_list = DinoList(dinos)
                 objects.append(gray_backdrop)
-                party_contracts = [party.Party(100, 0, 3), party.Party(100, 0, 5)]
                 party_contracts_list = party.PartyContractsList(party_contracts, (640, 10), True)
                 objects.append(party_contracts_list)
                 objects.append(dino_list)
@@ -596,7 +595,7 @@ while running:
             )
 
     elif game_state == "phase_contracts":
-        money_count_contract_text.text = f"Money: {money}"
+        money_count_contract_text.text = f"Money: {money}  -  Reputation: {reputation}"
         if mouse_just_pressed:
             for i in new_contracts_list.party_box_list:
                 if i.accept_button.rect.collidepoint(mouse_pos):
